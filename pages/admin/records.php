@@ -94,9 +94,9 @@
         <main class="flex-grow-1 p-4">
             
 
-        <p>Click on the floor to add a cabinet with a name.</p>
+      <h1>records</h1>
 
-<div id="floor-plan"></div>
+
 
         </main>
     </div>
@@ -104,36 +104,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>
 
-    <script>
-  const floorPlan = document.getElementById("floor-plan");
-  const cabinets = [];
-
-  floorPlan.addEventListener("click", function (e) {
-    const rect = floorPlan.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const label = prompt("Enter cabinet name or number:");
-    if (label) {
-      const marker = document.createElement("div");
-      marker.className = "cabinet-marker";
-      marker.style.left = `${x}px`;
-      marker.style.top = `${y}px`;
-
-      const icon = document.createElement("img");
-      icon.src = "../../assets/img/cabinet.png"; 
-
-      const name = document.createElement("div");
-      name.className = "cabinet-label";
-      name.textContent = label;
-
-      marker.appendChild(icon);
-      marker.appendChild(name);
-      floorPlan.appendChild(marker);
-
-      cabinets.push({ label, x, y });
-    }
-  });
-</script>
 </body>
 </html>
