@@ -9,6 +9,31 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
     <link rel="stylesheet" href="assets/css/index.css">
 </head>
+<style>
+    .mission-vision-container {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+.mission-box, .vision-box {
+    background: #e8f5e9;
+    border: 2px solid #388e3c;
+    border-radius: 12px;
+    padding: 24px 20px;
+    min-width: 260px;
+    box-shadow: 0 4px 16px rgba(56, 142, 60, 0.08);
+}
+.hero h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 3px 3px 12px rgba(34, 56, 34, 0.7), 0 2px 8px #388e3c;
+    letter-spacing: 2px;
+}
+</style>
 <body>
     <header class="header">
         <div class="container">
@@ -31,15 +56,30 @@
 
     <section class="hero">
         <div class="hero-content">
+            <p><br></p>
             <h1>Welcome to CENRO Manolo Fortich</h1>
-            <p>DENR's Mission: is to mobilize the citizenry to protect, conserve, and manage the environment and natural resources for present and future generations <br>DENR's Vision: A nation enjoying and sustaining its natural resources and a clean and healthy environment</p>
-            
+            <p><br><br></p>
+           
         </div>
     </section>
 
     <section id="about" class="about-section">
     <div class="container">
         <h2>About Us</h2>
+        <div class="container mission-vision-container">
+        <div class="mission-box" style="flex:1;">
+            <h3>DENR's Mission</h3>
+            <p>
+                To mobilize the citizenry to protect, conserve, and manage the environment and natural resources for present and future generations.
+            </p>
+        </div>
+        <div class="vision-box" style="flex:1;">
+            <h3>DENR's Vision</h3>
+            <p>
+                A nation enjoying and sustaining its natural resources and a clean and healthy environment.
+            </p>
+        </div>
+    </div>
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure nobis sint neque voluptas eveniet corrupti quidem repudiandae aliquid quae quis, cum tempora distinctio possimus omnis totam doloremque facilis quisquam voluptatum perspiciatis autem tempore. Quis molestias modi officia accusantium expedita distinctio deleniti veritatis perspiciatis recusandae numquam odio amet magnam reiciendis, ea temporibus omnis! Natus doloribus nisi commodi fugiat quas mollitia cumque, inventore repudiandae dignissimos voluptatum aliquid reiciendis expedita! Sit earum mollitia nostrum dolore quisquam! Officiis maxime placeat tempora incidunt enim, voluptatum asperiores ipsam animi, tenetur voluptates non expedita doloremque reprehenderit quo iure temporibus? Hic doloribus odio, quos iusto quo expedita esse!</p>
         <div class="about-images">
             <img src="assets/img/model1.webp" alt="model 1">
