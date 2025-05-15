@@ -33,7 +33,7 @@
         <div class="hero-content">
             <h1>Welcome to CENRO Manolo Fortich</h1>
             <p>DENR's Mission: is to mobilize the citizenry to protect, conserve, and manage the environment and natural resources for present and future generations <br>DENR's Vision: A nation enjoying and sustaining its natural resources and a clean and healthy environment</p>
-            <a href="#menu" class="btn">Explore Our Menu</a>
+            
         </div>
     </section>
 
