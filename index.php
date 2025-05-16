@@ -93,7 +93,7 @@
     <section id="contact" class="contact-section">
         <div class="container">
             <h2>Contact Us</h2>
-            <p>Have questions or want to order? Get in touch!</p>
+            <p>Have questions? Get in touch!</p>
             <p>Email: <a href="mailto:info@cenr.com">info@cenro.com</a></p>
             <p>Phone: <a href="tel:+1234567890">+1 234 567 890</a></p>
         </div>
@@ -101,7 +101,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 DENR-CENRO. All Rights Reserved.</p>
+            <p>&copy; <?php echo date('Y'); ?> DENR-CENRO. All Rights Reserved.</p>
         </div>
     </footer>
 </body>

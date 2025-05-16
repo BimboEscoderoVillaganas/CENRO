@@ -112,13 +112,12 @@
         <main class="flex-grow-1 p-4">
             
 
-      <h1>form</h1>
-
-    <section id="one-page">
+    
+<section id="one-page">
         <div class="container">
             <!-- Title -->
             <div class="row">
-                <h1 class="text-light">Input</h1>
+                <h1 class="text-dark">Form</h1>
             </div>
 
             <div class="row mt-4">
@@ -126,35 +125,35 @@
                 <div class="col-lg-5" id="insertion_section">
                     <form class="form-group justify-content-center">
                         <div class="row" id="name-section">
-                            <label for="bookName" class="text-light">Document Title</label>
+                            <label for="bookName" class="text-dark">Document Title</label>
                             <input type="text" class="form-control" id="bookName">
                         </div>
                         <div class="row" id="name-section">
-                            <label for="bookName" class="text-light">Document Type</label>
+                            <label for="bookName" class="text-dark">Document Type</label>
                             <input type="text" class="form-control" id="bookName">
                         </div>
                         <div class="row" id="author-section">
-                            <label for="authorName" class="text-light">Document Name</label>
+                            <label for="authorName" class="text-dark">Document Name</label>
                             <input type="text" class="form-control" id="authorName">
                         </div>
                         <div class="row" id="publisher-section">
-                            <label for="publisherName" class="text-light">Year</label>
+                            <label for="publisherName" class="text-dark">Year</label>
                             <input type="text" class="form-control" id="publisherName">
                         </div>
                         <div class="row" id="two-section">
                             <div class="col-6">
-                                <label for="numberPage" class="text-light">Number of pages</label>
+                                <label for="numberPage" class="text-dark">Number of pages</label>
                                 <input type="number" class="form-control" id="numberPage">
                             </div>
                             <div class="col-6">
-                                <label for="serialNumber" class="text-light">Serial Number</label>
+                                <label for="serialNumber" class="text-dark">Serial Number</label>
                                 <input type="number" class="form-control" id="serialNumber">
                             </div>
                         </div>
                         <div class="add-button mt-4">
                             <button type="button" class="btn btn-danger btn-block" id="add" >ADD</button>
                         </div>
-                      </from>
+                      </form>
                 </div>
 
                 <!-- Book List -->
