@@ -189,37 +189,72 @@ include '../../../src/db/db_connection.php';
             <div class="row mt-4">
                 <!-- insertion section -->
                 <div class="col-lg-5" id="insertion_section">
-                    <form class="form-group justify-content-center">
-                        <div class="row" id="name-section">
-                            <label for="bookName" class="text-dark">Document Title</label>
-                            <input type="text" class="form-control" id="bookName">
-                        </div>
-                        <div class="row" id="name-section">
-                            <label for="bookName" class="text-dark">Document Type</label>
-                            <input type="text" class="form-control" id="bookName">
-                        </div>
-                        <div class="row" id="author-section">
-                            <label for="authorName" class="text-dark">Document Name</label>
-                            <input type="text" class="form-control" id="authorName">
-                        </div>
-                        <div class="row" id="publisher-section">
-                            <label for="publisherName" class="text-dark">Year</label>
-                            <input type="text" class="form-control" id="publisherName">
-                        </div>
-                        <div class="row" id="two-section">
-                            <div class="col-6">
-                                <label for="numberPage" class="text-dark">Number of pages</label>
-                                <input type="number" class="form-control" id="numberPage">
-                            </div>
-                            <div class="col-6">
-                                <label for="serialNumber" class="text-dark">Serial Number</label>
-                                <input type="number" class="form-control" id="serialNumber">
-                            </div>
-                        </div>
-                        <div class="add-button mt-4">
-                            <button type="button" class="btn btn-danger btn-block" id="add" >ADD</button>
-                        </div>
-                      </form>
+                   <form class="form-group">
+    <div class="mb-3">
+        <label for="documentTitle" class="form-label text-dark">Document Title:</label>
+        <input type="text" class="form-control" id="documentTitle">
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label text-dark">Description:</label>
+        <textarea class="form-control" id="description" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="approvingAuthority" class="form-label text-dark">Approving Authority:</label>
+        <input type="text" class="form-control" id="approvingAuthority">
+    </div>
+
+    <div class="mb-3">
+        <label for="documentType" class="form-label text-dark">Document Type:</label>
+        <input type="text" class="form-control" id="documentType">
+    </div>
+
+    <div class="mb-3">
+        <label for="dateCreated" class="form-label text-dark">Date Created:</label>
+        <input type="date" class="form-control" id="dateCreated">
+    </div>
+
+    <div class="mb-3">
+        <label for="documentNumber" class="form-label text-dark">Document Number:</label>
+        <input type="text" class="form-control" id="documentNumber">
+    </div>
+
+    <div class="mb-3">
+        <label for="filedBy" class="form-label text-dark">Filed By:</label>
+        <input type="text" class="form-control" id="filedBy">
+    </div>
+
+    <div class="mb-3">
+        <label for="location" class="form-label text-dark">Location:</label>
+        <input type="text" class="form-control" id="location">
+    </div>
+
+    <div class="mb-3">
+        <label for="retentionSchedule" class="form-label text-dark">Retention Schedule:</label>
+        <input type="text" class="form-control" id="retentionSchedule">
+    </div>
+
+    <div class="mb-3">
+        <label for="accessLevel" class="form-label text-dark">Access Level:</label>
+        <select class="form-control" id="accessLevel">
+            <option value="">Select Access Level</option>
+            <option value="Public">Public</option>
+            <option value="Restricted">Restricted</option>
+            <option value="Confidential">Confidential</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="remarks" class="form-label text-dark">Remarks:</label>
+        <textarea class="form-control" id="remarks" rows="3"></textarea>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
                 </div>
 
                 <!-- Book List -->

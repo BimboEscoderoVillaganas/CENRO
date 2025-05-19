@@ -8,7 +8,7 @@ include '../../../src/db/db_connection.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../../../assets/images/logo.png" type="image/x-icon">
-    <title>All Records</title>
+    <title>Form</title>
     <!-- Bootstrap CSS CDN --> 
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/ae360af17e.js" crossorigin="anonymous"></script>
@@ -171,7 +171,7 @@ include '../../../src/db/db_connection.php';
                 <button type="button" id="sidebarCollapse" class="btn menu-btn">
                     <img src="../../../assets/images/burger-bar.png" alt="Menu" width="30" style="margin-left: 10px;">
                 </button>
-                <span class="menu-text">All Records</span>
+                <span class="menu-text">Form</span>
                 <img src="../../../assets/images/logo.png" alt="Logo" class="header-logo">
             </div>
             
@@ -184,7 +184,71 @@ include '../../../src/db/db_connection.php';
     <div class="container mt-4">
    
 
-    <h1>ALL RECORDS</h1>
+    <section id="one-page">
+        <div class="container">
+            <div class="row mt-4">
+                <!-- insertion section -->
+                <div class="col-lg-5" id="insertion_section">
+
+
+                </div>
+
+                <!-- Book List -->
+                <div class="col-lg-7" id="book_list">
+                    <table class="table table-borderless table-striped mt-3 ">
+                        <thead>
+                            <tr>
+                                <th scope="col">Document Title</th>
+                                <th scope="col">Document Type</th>
+                                <th scope="col">Date Created</th>
+                                <th scope="col"></th>
+                                <th scope="col">Serial</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabs">
+                            <tr class="tab">
+                                <th scope="row">The Hunger Games</th>
+                                <td>Suzanne Collins</td>
+                                <td>Alfa</td>
+                                <td>478</td>
+                                <td>1</td>
+                                <td>
+                                  <button type="button" class="close" aria-label="Close">
+                                    <span aria-hidden="true">X</span>
+                                  </button>
+                                </td>
+                            </tr>
+                            <tr class="tab">
+                                <th scope="row">Harry Potter</th>
+                                <td>J.K. Rowling</td>
+                                <td>Beta</td>
+                                <td>398</td>
+                                <td>2</td>
+                                <td>
+                                  <button type="button" class="close" aria-label="Close">
+                                    <span aria-hidden="true">X</span>
+                                  </button>
+                                </td>
+                            </tr>
+                            <tr class="tab">
+                                <th scope="row">To Kill a Mockingbird</th>
+                                <td>Harper Lee  </td>
+                                <td>Omega</td>
+                                <td>685</td>
+                                <td>3</td>
+                                <td>
+                                  <button type="button" class="close" aria-label="Close">
+                                    <span aria-hidden="true">X</span>
+                                  </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> 
+    </section>
 
     </div>
 

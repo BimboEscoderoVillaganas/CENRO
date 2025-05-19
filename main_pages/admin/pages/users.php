@@ -110,55 +110,53 @@ $result = $conn->query($sql);
                             Dashboard
                         </a>
                     </li>
-                        <li class="sidebar-item">
-                            <a href="view_deleted_by_user.php" class="sidebar-link" target="_blank">
-                                <i class="fa-regular fa-file-lines pe-2"></i>
-                                Archive
-                            </a>
-                        </li>
                     <li class="sidebar-header" style="
     font-weight: bold; color:gray;">
                         Tools & Components
                     </li>
                     <li class="sidebar-item">
-                <a href="#" id="formLink" class="sidebar-link">
+                <a href="form.php" class="sidebar-link">
                     <i class="fa-regular fa-file-lines pe-2"></i>
                     Form
                 </a>
             </li>
-                    <li class="sidebar-item">
+            <li class="sidebar-item">
+                <a href="records.php" class="sidebar-link">
+                    <i class="fa-regular fa-file-lines pe-2"></i>
+                    All file Records
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="permanent.php" class="sidebar-link">
+                    <i class="fa-regular fa-file-lines pe-2"></i>
+                    Permanent Records
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="archive_queue.php" class="sidebar-link">
+                    <i class="fa-regular fa-file-lines pe-2"></i>
+                    Archive Queue
+                </a>
+            </li>
+                    <!--<li class="sidebar-item">
                         <a href="reports.php" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pages"
                             aria-expanded="false" aria-controls="pages">
                             <i class="fa-solid fa-list pe-2"></i>
-                            Reports
+                            Records
                         </a>
                         <ul id="pages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                         <li class="sidebar-item">
-                                <a href="records.php" class="sidebar-link">Household Records</a>
+                                <a href="records.php" class="sidebar-link">All file Records</a>
                             </li>
                             <li class="sidebar-item">
-                                <a href="district_osy.php" class="sidebar-link">Manolo Fortich OSY</a>
+                                <a href="permanent.php" class="sidebar-link">Permanent Records</a>
                             </li>
                             <li class="sidebar-item">
-                                <a href="district_population.php" class="sidebar-link">Manolo Fortich Population</a>
+                                <a href="archive_queue.php" class="sidebar-link">Archive Queue</a>
                             </li>
-                            <li class="sidebar-item">
-                                <a href="osy_age.php" class="sidebar-link">OSY By Age</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="interested.php" class="sidebar-link">List of Interested in ALS</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="persons_with_disability.php" class="sidebar-link">Persons with Disability</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="no_occupation.php" class="sidebar-link">No Occupation</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="income_below_20,000.php" class="sidebar-link">Income Below ₱20,000</a>
-                            </li>
+                            
                         </ul>
-                    </li>
+                    </li>-->
                     <li class="sidebar-header" style="
     font-weight: bold; color:gray;">
                         Admin Action
