@@ -191,7 +191,7 @@ include '../../../src/db/db_connection.php';
                     <div class="card shadow-sm border-0">
                         <div class="card-body">
                             <h4 class="mb-4 text-center text-primary">Document Information Form</h4>
-                           <form class="form-group">
+                           <form class="form-group" method="POST" action="process_document.php">
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="documentTitle" class="form-label">Document Title</label>
