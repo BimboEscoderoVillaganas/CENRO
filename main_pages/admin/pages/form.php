@@ -191,52 +191,85 @@ include '../../../src/db/db_connection.php';
                     <div class="card shadow-sm border-0">
                         <div class="card-body">
                             <h4 class="mb-4 text-center text-primary">Document Information Form</h4>
+                            <!-- Add Cabinet Button -->
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCabinetModal">
+        <i class="fa fa-plus"></i> Add Cabinet
+    </button>
+</div>
+
                            <form class="form-group" method="POST" action="process_document.php">
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="documentTitle" class="form-label">Document Title</label>
-            <input type="text" class="form-control" id="documentTitle">
+            <input type="text" class="form-control" id="documentTitle" name="documentTitle" required>
         </div>
         <div class="col-md-6">
             <label for="documentNumber" class="form-label">Document Number</label>
-            <input type="text" class="form-control" id="documentNumber">
+            <input type="text" class="form-control" id="documentNumber" name="documentNumber" required>
         </div>
     </div>
 
     <div class="row mb-3">
         <div class="col-md-4">
             <label for="approvingAuthority" class="form-label">Approving Authority</label>
-            <input type="text" class="form-control" id="approvingAuthority">
+            <input type="text" class="form-control" id="approvingAuthority" name="approvingAuthority" required>
         </div>
         <div class="col-md-4">
             <label for="documentType" class="form-label">Document Type</label>
-            <input type="text" class="form-control" id="documentType">
+            <input type="text" class="form-control" id="documentType" name="documentType" required>
         </div>
         <div class="col-md-4">
             <label for="dateCreated" class="form-label">Date Created</label>
-            <input type="date" class="form-control" id="dateCreated">
+            <input type="date" class="form-control" id="dateCreated" name="dateCreated" required>
         </div>
     </div>
 
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="filedBy" class="form-label">Filed By</label>
-            <input type="text" class="form-control" id="filedBy">
+            <input type="text" class="form-control" id="filedBy" name="filedBy" required>
         </div>
         <div class="col-md-6">
-            <label for="location" class="form-label">Location</label>
-            <input type="text" class="form-control" id="location">
-        </div>
+    <label for="location" class="form-label">Location</label>
+    <select class="form-select" id="location" name="location" required>
+        <option value="">Select Location</option>
+        <?php
+        // Database connection
+        $host = 'localhost';
+        $dbname = 'cenro_records_db';
+        $username = 'root';
+        $password = '';
+        
+        try {
+            $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            // Fetch cabinet locations
+            $stmt = $conn->query("SELECT cabinet_number, cabinet_code, cabinet_location FROM cabinet_tbl ORDER BY cabinet_location, cabinet_number");
+            $cabinets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach ($cabinets as $cabinet) {
+                $displayText = htmlspecialchars($cabinet['cabinet_location']) . '-' . htmlspecialchars($cabinet['cabinet_code']);
+                $value = htmlspecialchars($cabinet['cabinet_number']);
+                echo "<option value='$value'>$displayText</option>";
+            }
+        } catch(PDOException $e) {
+            echo "<option value=''>Error loading locations</option>";
+        }
+        ?>
+    </select>
+</div>
     </div>
 
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="retentionSchedule" class="form-label">Retention Schedule</label>
-            <input type="text" class="form-control" id="retentionSchedule">
+            <input type="text" class="form-control" id="retentionSchedule" name="retentionSchedule" required>
         </div>
         <div class="col-md-6">
             <label for="accessLevel" class="form-label">Access Level</label>
-            <select class="form-select" id="accessLevel">
+            <select class="form-select" id="accessLevel" name="accessLevel" required>
                 <option value="">Select Access Level</option>
                 <option value="Public">Public</option>
                 <option value="Restricted">Restricted</option>
@@ -248,11 +281,11 @@ include '../../../src/db/db_connection.php';
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" rows="3"></textarea>
+            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
         </div>
         <div class="col-md-6">
             <label for="remarks" class="form-label">Remarks</label>
-            <textarea class="form-control" id="remarks" rows="3"></textarea>
+            <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
         </div>
     </div>
 
@@ -261,6 +294,33 @@ include '../../../src/db/db_connection.php';
     </div>
 </form>
 
+    <!-- Add Cabinet Modal -->
+<div class="modal fade" id="addCabinetModal" tabindex="-1" aria-labelledby="addCabinetModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="process_add_cabinet.php"> <!-- Adjust the action if needed -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCabinetModalLabel">Add Cabinet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="cabinetCode" class="form-label">Cabinet Code</label>
+                <input type="text" class="form-control" id="cabinetCode" name="cabinet_code" required>
+            </div>
+            <div class="mb-3">
+                <label for="cabinetLocation" class="form-label">Cabinet Location</label>
+                <input type="text" class="form-control" id="cabinetLocation" name="cabinet_location" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save Cabinet</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
                         </div>
                     </div>
                 </div>
@@ -332,6 +392,8 @@ include '../../../src/db/db_connection.php';
 
 
 
+<!-- Bootstrap JS (required for modal) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- jQuery CDN - Slim version (=without AJAX) -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
