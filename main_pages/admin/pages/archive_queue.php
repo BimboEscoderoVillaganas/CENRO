@@ -85,7 +85,7 @@ include '../../../src/db/db_connection.php';
                     <li class="sidebar-item">
                 <a href="form.php" class="sidebar-link">
                     <i class="fa-regular fa-file-lines pe-2"></i>
-                    Record
+                    Form
                 </a>
             </li>
             <li class="sidebar-item">

@@ -26,7 +26,11 @@ include '../../../src/db/db_connection.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <style>
-
+/* Alert styling */
+.alert {
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 .active2 {
         background-color: #b9b9b9;
         color: white;
@@ -461,6 +465,42 @@ include '../../../src/db/db_connection.php';
             });
         });
     });
+</script>
+<script>
+// Display alert message if exists
+<?php if (isset($_SESSION['alert'])): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alertType = '<?php echo $_SESSION['alert']['type']; ?>';
+        const alertMessage = '<?php echo $_SESSION['alert']['message']; ?>';
+        
+        // Create and show Bootstrap alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${alertType} alert-dismissible fade show`;
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            ${alertMessage}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        document.body.appendChild(alertDiv);
+        
+        // Remove alert after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+        
+        // Clear the session alert
+        <?php unset($_SESSION['alert']); ?>
+    });
+<?php endif; ?>
+
+// For the Add Cabinet modal - clear form on close
+document.getElementById('addCabinetModal').addEventListener('hidden.bs.modal', function () {
+    this.querySelector('form').reset();
+});
 </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
