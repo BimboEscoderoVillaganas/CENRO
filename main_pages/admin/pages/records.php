@@ -172,73 +172,9 @@ include '../../../src/db/db_connection.php';
 <div class="container-fluid">
     <div class="container mt-4">
    
+    <!--content here-->
 
-    <section id="one-page">
-        <div class="container">
-            <div class="row mt-4">
-                <!-- insertion section -->
-                <div class="col-lg-5" id="insertion_section">
-
-
-                </div>
-
-                <!-- Book List -->
-                <div class="col-lg-7" id="book_list">
-                    <table class="table table-borderless table-striped mt-3 ">
-                        <thead>
-                            <tr>
-                                <th scope="col">Document Title</th>
-                                <th scope="col">Document Type</th>
-                                <th scope="col">Date Created</th>
-                                <th scope="col"></th>
-                                <th scope="col">Serial</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabs">
-                            <tr class="tab">
-                                <th scope="row">The Hunger Games</th>
-                                <td>Suzanne Collins</td>
-                                <td>Alfa</td>
-                                <td>478</td>
-                                <td>1</td>
-                                <td>
-                                  <button type="button" class="close" aria-label="Close">
-                                    <span aria-hidden="true">X</span>
-                                  </button>
-                                </td>
-                            </tr>
-                            <tr class="tab">
-                                <th scope="row">Harry Potter</th>
-                                <td>J.K. Rowling</td>
-                                <td>Beta</td>
-                                <td>398</td>
-                                <td>2</td>
-                                <td>
-                                  <button type="button" class="close" aria-label="Close">
-                                    <span aria-hidden="true">X</span>
-                                  </button>
-                                </td>
-                            </tr>
-                            <tr class="tab">
-                                <th scope="row">To Kill a Mockingbird</th>
-                                <td>Harper Lee  </td>
-                                <td>Omega</td>
-                                <td>685</td>
-                                <td>3</td>
-                                <td>
-                                  <button type="button" class="close" aria-label="Close">
-                                    <span aria-hidden="true">X</span>
-                                  </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div> 
-    </section>
-
+    
     </div>
 
     </div>
