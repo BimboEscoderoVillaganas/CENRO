@@ -191,7 +191,7 @@ include '../../../src/db/db_connection.php';
     </button>
 </div>
 
-                           <form class="form-group" method="POST" action="process_document.php">
+<form class="form-group" method="POST" action="process_document.php" enctype="multipart/form-data">
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="documentTitle" class="form-label">Document Title</label>
@@ -282,10 +282,47 @@ include '../../../src/db/db_connection.php';
         </div>
     </div>
 
+    
+    
+    <!-- File Upload Section with Preview and Clear -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <label class="form-label">File Attachment (Optional)</label>
+        <div class="input-group mb-2">
+            <input type="file" class="form-control" id="fileUpload" name="documentFile" style="display: none;" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('fileUpload').click()">
+                <i class="fas fa-paperclip"></i> Choose File
+            </button>
+            <input type="text" class="form-control" id="fileNameDisplay" placeholder="No file chosen" readonly>
+            <button type="button" class="btn btn-outline-danger" id="clearFileBtn" style="display: none;">
+                <i class="fas fa-times"></i> Clear
+            </button>
+        </div>
+        
+        <!-- File Preview Container -->
+        <div id="filePreviewContainer" class="mt-2" style="display: none;">
+            <div class="card">
+                <div class="card-body p-2">
+                    <div class="d-flex align-items-center">
+                        <div id="filePreviewIcon" class="me-3 fs-1"></div>
+                        <div>
+                            <h6 id="filePreviewName" class="mb-0"></h6>
+                            <small id="filePreviewSize" class="text-muted"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <small class="text-muted">Allowed formats: PDF, DOC, DOCX, JPG, PNG (Max 10MB)</small>
+    </div>
+</div>
+
     <div class="text-end">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </form>
+
 
     <!-- Add Cabinet Modal -->
 <div class="modal fade" id="addCabinetModal" tabindex="-1" aria-labelledby="addCabinetModalLabel" aria-hidden="true">
@@ -490,6 +527,86 @@ include '../../../src/db/db_connection.php';
 document.getElementById('addCabinetModal').addEventListener('hidden.bs.modal', function () {
     this.querySelector('form').reset();
 });
+
+</script>
+
+<script>
+// File type to icon mapping
+const fileIcons = {
+    'pdf': 'far fa-file-pdf text-danger',
+    'doc': 'far fa-file-word text-primary',
+    'docx': 'far fa-file-word text-primary',
+    'jpg': 'far fa-file-image text-success',
+    'jpeg': 'far fa-file-image text-success',
+    'png': 'far fa-file-image text-success',
+    'default': 'far fa-file'
+};
+
+// Get DOM elements
+const fileInput = document.getElementById('fileUpload');
+const fileNameDisplay = document.getElementById('fileNameDisplay');
+const clearFileBtn = document.getElementById('clearFileBtn');
+const previewContainer = document.getElementById('filePreviewContainer');
+const previewIcon = document.getElementById('filePreviewIcon');
+const previewName = document.getElementById('filePreviewName');
+const previewSize = document.getElementById('filePreviewSize');
+
+// Display selected file with preview
+fileInput.addEventListener('change', function(e) {
+    if (this.files.length > 0) {
+        const file = this.files[0];
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        
+        // Update filename display
+        fileNameDisplay.value = file.name;
+        clearFileBtn.style.display = 'block';
+        
+        // Update preview
+        previewName.textContent = file.name;
+        previewSize.textContent = formatFileSize(file.size);
+        previewIcon.className = fileIcons[fileExt] || fileIcons['default'];
+        
+        // Show preview container
+        previewContainer.style.display = 'block';
+        
+        // For image files, show thumbnail preview
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewIcon.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="max-height: 60px;">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    } else {
+        resetFilePreview();
+    }
+});
+
+// Clear file selection
+clearFileBtn.addEventListener('click', function() {
+    fileInput.value = '';
+    resetFilePreview();
+});
+
+// Format file size
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Reset preview elements
+function resetFilePreview() {
+    fileNameDisplay.value = '';
+    clearFileBtn.style.display = 'none';
+    previewContainer.style.display = 'none';
+    previewIcon.className = '';
+    previewIcon.innerHTML = '';
+    previewName.textContent = '';
+    previewSize.textContent = '';
+}
 </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
