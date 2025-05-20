@@ -17,7 +17,9 @@ include '../api/fetch_summary_data.php';
     <link rel="stylesheet" href="../../../src/css/nav.css">
     <!-- Scrollbar Custom CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
-
+<!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+   
 <!--For SimpleStatistics-->
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/solution.css">
@@ -136,148 +138,107 @@ p.card-text{
 
 <body>
     <div class="wrapper">
-        <!-- Sidebar  -->
-        <nav id="sidebar">
-            <div class="sidebar-header" style="background: gray;">
-                <h3 style="color: #ffffff;">
-                <?php
-session_start();
+    <!-- Sidebar  -->
+    <nav id="sidebar">
+        <div class="sidebar-header" style="background: gray;">
+            <h3 style="color: #ffffff;">
+                <i class="fa-solid fa-user-circle me-2"></i>
+            <?php
+                session_start();
+                if (!isset($_SESSION['username'])) {
+                    header('Location: ../../../index.php');
+                    exit();
+                }
+                echo '<a href="#">' . htmlspecialchars($_SESSION['username']) . '</a>';
+            ?>
+        </h3>
+    </div>
 
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ../../../index.php');
-    exit();
-}
+    <li class="sidebar-header title" style="font-weight: bold; color: gray;">
+        Key Performance Indicator
+    </li>
+    <li class="sidebar-item active2">
+        <a href="dashboard.php" class="sidebar-link">
+            <i class="fa-solid fa-chart-line pe-2"></i>
+            Dashboard
+        </a>
+    </li>
 
-// Include the database connection
-include '../../../src/db/db_connection.php';
+    <li class="sidebar-header" style="font-weight: bold; color: gray;">
+        Tools & Components
+    </li>
+    <li class="sidebar-item">
+        <a href="form.php" class="sidebar-link">
+            <i class="fa-solid fa-pen-to-square pe-2"></i>
+            Form
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="records.php" class="sidebar-link">
+            <i class="fa-solid fa-folder-open pe-2"></i>
+            All File Records
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="permanent.php" class="sidebar-link">
+            <i class="fa-solid fa-box-archive pe-2"></i>
+            Permanent Records
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="archive_queue.php" class="sidebar-link">
+            <i class="fa-solid fa-clock-rotate-left pe-2"></i>
+            Archive Queue
+        </a>
+    </li>
+    
+    <li class="sidebar-item">
+        <a href="archived.php" class="sidebar-link">
+            <i class="fa-solid fa-box-archive pe-2"></i>
+            Archived
+        </a>
+    </li>
 
-// Fetch the latest user data from the database based on session user_id
-$user_id = $_SESSION['user_id']; // Assuming user_id is stored in the session during login
 
-// Adjust column name to match your database structure
-$sql = "SELECT user_name FROM user_tbl WHERE user_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    // Update the session username with the latest data from the database
-    $_SESSION['username'] = $row['user_name']; // Adjusted to 'user_name'
-}
-
-// Display the latest username
-if (isset($_SESSION['username'])) {
-    echo '<a href="#">' . htmlspecialchars($_SESSION['username']) . '</a>';
-} else {
-    echo '<a href="#">Admin</a>';
-}
-
-$stmt->close();
-$conn->close();
-?>
-
-            </h3>
-                
-            </div>
-
-            <li class="sidebar-header title" style="
-    font-weight: bold; color:gray;">
-                        Key Performans Indicator
-                    </li>
-                    <li class="sidebar-item active4">
-                        <a href="dashboard.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                        <li class="sidebar-item">
-                            <a href="view_deleted_by_user.php" class="sidebar-link" target="_blank">
-                                <i class="fa-regular fa-file-lines pe-2"></i>
-                                Archive
-                            </a>
-                        </li>
-                    <li class="sidebar-header" style="
-    font-weight: bold; color:gray;">
-                        Tools & Components
-                    </li>
-                    <li class="sidebar-item">
-                <a href="#" id="formLink" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    Form
+    <li class="sidebar-header" style="font-weight: bold; color: gray;">
+        Admin Action
+    </li>
+    <li class="sidebar-item">
+        <a href="users.php" class="sidebar-link">
+            <i class="fa-solid fa-users pe-2"></i>
+            Users
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="user_log.php" class="sidebar-link">
+            <i class="fa-solid fa-file-lines pe-2"></i>
+            User Log
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"
+           aria-expanded="false" aria-controls="auth">
+            <i class="fa-solid fa-user-gear pe-2"></i>
+            Account Settings
+        </a>
+        <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+            <li class="sidebar-item">
+                <a href="edit_profile.php" class="sidebar-link">
+                    <i class="fa-solid fa-user-pen pe-2"></i>
+                    Edit Profile
                 </a>
             </li>
-                    <li class="sidebar-item">
-                        <a href="reports.php" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pages"
-                            aria-expanded="false" aria-controls="pages">
-                            <i class="fa-solid fa-list pe-2"></i>
-                            Reports
-                        </a>
-                        <ul id="pages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                        <li class="sidebar-item">
-                                <a href="records.php" class="sidebar-link">Household Records</a>
-                            </li>
-                            
-                            <li class="sidebar-item">
-                                <a href="district_osy.php" class="sidebar-link">Manolo Fortich OSY</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="district_population.php" class="sidebar-link">Manolo Fortich Population</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="osy_age.php" class="sidebar-link">OSY By Age</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="interested.php" class="sidebar-link">List of Interested in ALS</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="persons_with_disability.php" class="sidebar-link">Persons with Disability</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="no_occupation.php" class="sidebar-link">No Occupation</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="income_below_20,000.php" class="sidebar-link">Income Below ₱20,000</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="sidebar-header" style="
-    font-weight: bold; color:gray;">
-                        Admin Action
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="users.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            Users
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="user_log.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            User Log
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"
-                            aria-expanded="false" aria-controls="auth">
-                            <i class="fa-regular fa-user pe-2"></i>
-                            Account Settings
-                        </a>
-                        <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                          
-                        <li class="sidebar-item">
-                                <a href="edit_profile.php" class="sidebar-link">Edit Profile</a>
-                            </li>
-                            <li class="sidebar-item">
-                            <a href="logout.php" class="sidebar-link" onclick="return confirmLogout();">Log Out</a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                </ul>
-        </nav>
+            <li class="sidebar-item">
+                <a href="logout.php" class="sidebar-link" onclick="return confirmLogout();">
+                    <i class="fa-solid fa-right-from-bracket pe-2"></i>
+                    Log Out
+                </a>
+            </li>
+        </ul>
+    </li>
+</nav>
+
+
 
 
         <!-- Modal Structure -->

@@ -16,7 +16,9 @@ include '../../../src/db/db_connection.php';
     <link rel="stylesheet" href="../../../src/css/nav.css">
     <!-- Scrollbar Custom CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
-
+<!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
 <!--For SimpleStatistics-->
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -46,120 +48,106 @@ include '../../../src/db/db_connection.php';
 
 <body>
     <div class="wrapper">
-        <!-- Sidebar  -->
-        <nav id="sidebar">
-            <div class="sidebar-header" style="background: gray;">
-                <h3 style="color: #ffffff;">
-                
-                <?php
-                    session_start();
-                    if (!isset($_SESSION['username'])) {
-                        header('Location: ../../../index.php');
-                        exit();
-                    }
-                    if (isset($_SESSION['username'])) {
-                        echo '<a href="#">' . htmlspecialchars($_SESSION['username']) . '</a>';
-                    } else {
-                        echo '<a href="#">Admin</a>';
-                    }
-                ?>
+    <!-- Sidebar  -->
+    <nav id="sidebar">
+        <div class="sidebar-header" style="background: gray;">
+            <h3 style="color: #ffffff;">
+                <i class="fa-solid fa-user-circle me-2"></i>
+            <?php
+                session_start();
+                if (!isset($_SESSION['username'])) {
+                    header('Location: ../../../index.php');
+                    exit();
+                }
+                echo '<a href="#">' . htmlspecialchars($_SESSION['username']) . '</a>';
+            ?>
+        </h3>
+    </div>
 
-            </h3>
-                
-            </div>
+    <li class="sidebar-header title" style="font-weight: bold; color: gray;">
+        Key Performance Indicator
+    </li>
+    <li class="sidebar-item active2">
+        <a href="dashboard.php" class="sidebar-link">
+            <i class="fa-solid fa-chart-line pe-2"></i>
+            Dashboard
+        </a>
+    </li>
 
-            <li class="sidebar-header title" style="
-    font-weight: bold; color:gray;">
-                        Key Performans Indicator
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="dashboard.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="sidebar-header" style="
-    font-weight: bold; color:gray;">
-                        Tools & Components
-                    </li>
-                    <li class="sidebar-item">
-                <a href="form.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    Form
+    <li class="sidebar-header" style="font-weight: bold; color: gray;">
+        Tools & Components
+    </li>
+    <li class="sidebar-item">
+        <a href="form.php" class="sidebar-link">
+            <i class="fa-solid fa-pen-to-square pe-2"></i>
+            Form
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="records.php" class="sidebar-link">
+            <i class="fa-solid fa-folder-open pe-2"></i>
+            All File Records
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="permanent.php" class="sidebar-link">
+            <i class="fa-solid fa-box-archive pe-2"></i>
+            Permanent Records
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="archive_queue.php" class="sidebar-link">
+            <i class="fa-solid fa-clock-rotate-left pe-2"></i>
+            Archive Queue
+        </a>
+    </li>
+    
+    <li class="sidebar-item">
+        <a href="archived.php" class="sidebar-link">
+            <i class="fa-solid fa-box-archive pe-2"></i>
+            Archived
+        </a>
+    </li>
+
+
+    <li class="sidebar-header" style="font-weight: bold; color: gray;">
+        Admin Action
+    </li>
+    <li class="sidebar-item">
+        <a href="users.php" class="sidebar-link">
+            <i class="fa-solid fa-users pe-2"></i>
+            Users
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="user_log.php" class="sidebar-link">
+            <i class="fa-solid fa-file-lines pe-2"></i>
+            User Log
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"
+           aria-expanded="false" aria-controls="auth">
+            <i class="fa-solid fa-user-gear pe-2"></i>
+            Account Settings
+        </a>
+        <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+            <li class="sidebar-item">
+                <a href="edit_profile.php" class="sidebar-link">
+                    <i class="fa-solid fa-user-pen pe-2"></i>
+                    Edit Profile
                 </a>
             </li>
             <li class="sidebar-item">
-                <a href="records.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    All file Records
+                <a href="logout.php" class="sidebar-link" onclick="return confirmLogout();">
+                    <i class="fa-solid fa-right-from-bracket pe-2"></i>
+                    Log Out
                 </a>
             </li>
-            <li class="sidebar-item">
-                <a href="permanent.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    Permanent Records
-                </a>
-            </li>
-            <li class="sidebar-item active2">
-                <a href="archive_queue.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    Archive Queue
-                </a>
-            </li>
-                    <!--<li class="sidebar-item">
-                        <a href="reports.php" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pages"
-                            aria-expanded="false" aria-controls="pages">
-                            <i class="fa-solid fa-list pe-2"></i>
-                            Records
-                        </a>
-                        <ul id="pages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                        <li class="sidebar-item">
-                                <a href="records.php" class="sidebar-link">All file Records</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="permanent.php" class="sidebar-link">Permanent Records</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="archive_queue.php" class="sidebar-link">Archive Queue</a>
-                            </li>
-                            
-                        </ul>
-                    </li>-->
-                    <li class="sidebar-header" style="
-    font-weight: bold; color:gray;">
-                        Admin Action
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="users.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            Users
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="user_log.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            User Log
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"
-                            aria-expanded="false" aria-controls="auth">
-                            <i class="fa-regular fa-user pe-2"></i>
-                            Account Settings
-                        </a>
-                        <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                          
-                        <li class="sidebar-item">
-                                <a href="edit_profile.php" class="sidebar-link">Edit Profile</a>
-                            </li>
-                            <li class="sidebar-item">
-                            <a href="logout.php" class="sidebar-link" onclick="return confirmLogout();">Log Out</a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                </ul>
-        </nav>
+        </ul>
+    </li>
+</nav>
+
 
 
        
