@@ -1,5 +1,11 @@
 <?php
 include '../../../src/db/db_connection.php';
+
+$total_records = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM document_tbl"))['count'];
+$permanent_records = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM document_tbl WHERE status = 'permanent'"))['count'];
+$archive_queue = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM document_tbl WHERE status = 'queued'"))['count'];
+$total_users = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM user_tbl"))['count'];
+
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +25,7 @@ include '../../../src/db/db_connection.php';
 
 <!--For SimpleStatistics-->
     <link rel="stylesheet" href="../css/style.css">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/simple-statistics@7.0.2/dist/simple-statistics.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/7.8.1/simple-statistics.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -186,8 +192,54 @@ include '../../../src/db/db_connection.php';
 
     <h1>DASHBOARD</h1>
 
-    </div>
+ <div class="container mt-4">
+    <h1 class="mb-4">Dashboard Overview</h1>
 
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card bg-primary h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Total Records</h5>
+                    <p class="card-text fs-3 text-white"><?php echo $total_records; ?></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Permanent Records</h5>
+                    <p class="card-text fs-3 text-white"><?php echo $permanent_records; ?></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Archive Queue</h5>
+                    <p class="card-text fs-3 text-white"><?php echo $archive_queue; ?></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-dark h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-white">Registered Users</h5>
+                    <p class="card-text fs-3 text-white"><?php echo $total_users; ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+   <div class="mt-5">
+    <h3>Document Summary Chart</h3>
+    <canvas id="documentChart" width="200" height="100"></canvas>
+</div>
+</div>
     </div>
 
 <br>
@@ -249,7 +301,49 @@ include '../../../src/db/db_connection.php';
 
 
 
+<script>
+    const totalRecords = <?php echo $total_records; ?>;
+    const permanentRecords = <?php echo $permanent_records; ?>;
+    const archiveQueue = <?php echo $archive_queue; ?>;
+    const totalUsers = <?php echo $total_users; ?>;
 
+    const ctx = document.getElementById('documentChart').getContext('2d');
+    const documentChart = new Chart(ctx, {
+        type: 'bar', // You can change to 'pie', 'doughnut', etc.
+        data: {
+            labels: ['Total Records', 'Permanent', 'Archive Queue', 'Users'],
+            datasets: [{
+                label: 'Document Overview',
+                data: [totalRecords, permanentRecords, archiveQueue, totalUsers],
+                backgroundColor: [
+                    'rgba(0, 123, 255, 0.7)',
+                    'rgba(40, 167, 69, 0.7)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(33, 37, 41, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(0, 123, 255, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(33, 37, 41, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 
 
 <!-- jQuery CDN - Slim version (=without AJAX) -->
