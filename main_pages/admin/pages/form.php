@@ -28,6 +28,20 @@ include '../../../src/db/db_connection.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <style>
+.capacity-indicator {
+    background-color: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+}
+.remove-file {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.75rem;
+}
+.preview-image {
+    transition: all 0.3s ease;
+}
+</style>
+<style>
 /* Alert styling */
 .alert {
     max-width: 400px;
@@ -284,37 +298,37 @@ include '../../../src/db/db_connection.php';
 
     
     
-    <!-- File Upload Section with Preview and Clear -->
+    <!-- File Upload Section with Multiple Files Support -->
 <div class="row mb-3">
     <div class="col-md-12">
-        <label class="form-label">File Attachment (Optional)</label>
+        <label class="form-label">
+    File Attachments (<span class="text-danger">Optional</span>)
+</label>
         <div class="input-group mb-2">
-            <input type="file" class="form-control" id="fileUpload" name="documentFile" style="display: none;" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+            <input type="file" class="form-control" id="fileUpload" name="documentFiles[]" style="display: none;" 
+                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
             <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('fileUpload').click()">
-                <i class="fas fa-paperclip"></i> Choose File
+                <i class="fas fa-paperclip"></i> Choose Files
             </button>
-            <input type="text" class="form-control" id="fileNameDisplay" placeholder="No file chosen" readonly>
+            <input type="text" class="form-control" id="fileNameDisplay" placeholder="No files chosen" readonly>
             <button type="button" class="btn btn-outline-danger" id="clearFileBtn" style="display: none;">
-                <i class="fas fa-times"></i> Clear
+                <i class="fas fa-times"></i> Clear All
             </button>
         </div>
         
-        <!-- File Preview Container -->
-        <div id="filePreviewContainer" class="mt-2" style="display: none;">
-            <div class="card">
-                <div class="card-body p-2">
-                    <div class="d-flex align-items-center">
-                        <div id="filePreviewIcon" class="me-3 fs-1"></div>
-                        <div>
-                            <h6 id="filePreviewName" class="mb-0"></h6>
-                            <small id="filePreviewSize" class="text-muted"></small>
-                        </div>
-                    </div>
-                </div>
+        <!-- Files Preview Container -->
+        <div id="filesPreviewContainer" class="mt-2"></div>
+        
+        <!-- Capacity Indicator -->
+        <div class="capacity-indicator mt-2">
+            <div class="d-flex justify-content-between">
+                <small class="text-muted">Allowed formats: PDF, DOC, DOCX, JPG, PNG</small>
+                <small id="remainingCapacity" class="text-muted">10MB available</small>
+            </div>
+            <div class="progress" style="height: 5px;">
+                <div id="fileSizeProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
             </div>
         </div>
-        
-        <small class="text-muted">Allowed formats: PDF, DOC, DOCX, JPG, PNG (Max 10MB)</small>
     </div>
 </div>
 
@@ -531,6 +545,13 @@ document.getElementById('addCabinetModal').addEventListener('hidden.bs.modal', f
 </script>
 
 <script>
+// Configuration
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+let currentTotalSize = 0;
+const filesPreviewContainer = document.getElementById('filesPreviewContainer');
+const fileSizeProgress = document.getElementById('fileSizeProgress');
+const remainingCapacity = document.getElementById('remainingCapacity');
+
 // File type to icon mapping
 const fileIcons = {
     'pdf': 'far fa-file-pdf text-danger',
@@ -542,51 +563,117 @@ const fileIcons = {
     'default': 'far fa-file'
 };
 
-// Get DOM elements
-const fileInput = document.getElementById('fileUpload');
-const fileNameDisplay = document.getElementById('fileNameDisplay');
-const clearFileBtn = document.getElementById('clearFileBtn');
-const previewContainer = document.getElementById('filePreviewContainer');
-const previewIcon = document.getElementById('filePreviewIcon');
-const previewName = document.getElementById('filePreviewName');
-const previewSize = document.getElementById('filePreviewSize');
-
-// Display selected file with preview
-fileInput.addEventListener('change', function(e) {
-    if (this.files.length > 0) {
-        const file = this.files[0];
-        const fileExt = file.name.split('.').pop().toLowerCase();
-        
-        // Update filename display
-        fileNameDisplay.value = file.name;
-        clearFileBtn.style.display = 'block';
-        
-        // Update preview
-        previewName.textContent = file.name;
-        previewSize.textContent = formatFileSize(file.size);
-        previewIcon.className = fileIcons[fileExt] || fileIcons['default'];
-        
-        // Show preview container
-        previewContainer.style.display = 'block';
-        
-        // For image files, show thumbnail preview
-        if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewIcon.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="max-height: 60px;">`;
-            }
-            reader.readAsDataURL(file);
+// Display selected files with preview
+document.getElementById('fileUpload').addEventListener('change', function(e) {
+    const files = Array.from(this.files);
+    let newFiles = [];
+    let totalSize = currentTotalSize;
+    
+    // Check each new file
+    files.forEach(file => {
+        if ((totalSize + file.size) > MAX_FILE_SIZE) {
+            alert(`Cannot add "${file.name}" - would exceed 10MB limit`);
+            return;
         }
-    } else {
-        resetFilePreview();
-    }
+        totalSize += file.size;
+        newFiles.push(file);
+    });
+    
+    if (newFiles.length === 0) return;
+    
+    // Add new files to preview
+    newFiles.forEach(file => {
+        addFilePreview(file);
+        currentTotalSize += file.size;
+    });
+    
+    updateCapacityDisplay();
+    updateFileNameDisplay();
+    document.getElementById('clearFileBtn').style.display = 'block';
 });
 
-// Clear file selection
-clearFileBtn.addEventListener('click', function() {
-    fileInput.value = '';
-    resetFilePreview();
+// Clear all files
+document.getElementById('clearFileBtn').addEventListener('click', function() {
+    document.getElementById('fileUpload').value = '';
+    filesPreviewContainer.innerHTML = '';
+    currentTotalSize = 0;
+    updateCapacityDisplay();
+    document.getElementById('fileNameDisplay').value = '';
+    this.style.display = 'none';
 });
+
+// Add individual file preview
+function addFilePreview(file) {
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const previewId = 'preview-' + Math.random().toString(36).substr(2, 9);
+    
+    const previewElement = document.createElement('div');
+    previewElement.className = 'card mb-2';
+    previewElement.id = previewId;
+    previewElement.innerHTML = `
+        <div class="card-body p-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="me-3 ${fileIcons[fileExt] || fileIcons['default']}"></div>
+                    <div>
+                        <h6 class="mb-0">${file.name}</h6>
+                        <small class="text-muted">${formatFileSize(file.size)}</small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-file" data-size="${file.size}">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            ${file.type.startsWith('image/') ? `
+            <div class="mt-2 text-center">
+                <img src="#" class="img-thumbnail preview-image" style="max-height: 100px; display: none;">
+            </div>
+            ` : ''}
+        </div>
+    `;
+    
+    filesPreviewContainer.appendChild(previewElement);
+    
+    // Load image preview if image file
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = previewElement.querySelector('.preview-image');
+            img.src = e.target.result;
+            img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Add remove file handler
+    previewElement.querySelector('.remove-file').addEventListener('click', function() {
+        currentTotalSize -= parseInt(this.getAttribute('data-size'));
+        filesPreviewContainer.removeChild(previewElement);
+        updateCapacityDisplay();
+        updateFileNameDisplay();
+        if (currentTotalSize === 0) {
+            document.getElementById('clearFileBtn').style.display = 'none';
+        }
+    });
+}
+
+// Update capacity display
+function updateCapacityDisplay() {
+    const percentUsed = Math.round((currentTotalSize / MAX_FILE_SIZE) * 100);
+    const remainingMB = (MAX_FILE_SIZE - currentTotalSize) / (1024 * 1024);
+    
+    fileSizeProgress.style.width = `${percentUsed}%`;
+    fileSizeProgress.className = `progress-bar ${percentUsed > 90 ? 'bg-danger' : percentUsed > 70 ? 'bg-warning' : 'bg-success'}`;
+    remainingCapacity.textContent = `${remainingMB.toFixed(2)}MB remaining (${percentUsed}% used)`;
+}
+
+// Update file name display
+function updateFileNameDisplay() {
+    const fileCount = filesPreviewContainer.children.length;
+    document.getElementById('fileNameDisplay').value = fileCount > 0 
+        ? `${fileCount} file${fileCount > 1 ? 's' : ''} selected` 
+        : 'No files chosen';
+}
 
 // Format file size
 function formatFileSize(bytes) {
@@ -596,18 +683,8 @@ function formatFileSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
-
-// Reset preview elements
-function resetFilePreview() {
-    fileNameDisplay.value = '';
-    clearFileBtn.style.display = 'none';
-    previewContainer.style.display = 'none';
-    previewIcon.className = '';
-    previewIcon.innerHTML = '';
-    previewName.textContent = '';
-    previewSize.textContent = '';
-}
 </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 19, 2025 at 09:04 AM
+-- Generation Time: May 20, 2025 at 09:13 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,31 @@ CREATE TABLE `cabinet_tbl` (
   `cabinet_code` varchar(50) DEFAULT NULL,
   `cabinet_location` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cabinet_tbl`
+--
+
+INSERT INTO `cabinet_tbl` (`cabinet_number`, `cabinet_code`, `cabinet_location`) VALUES
+(1, '001', 'A'),
+(2, '002', 'A'),
+(3, '001', 'B'),
+(4, '002', 'B'),
+(5, '003', 'A'),
+(6, '003', 'B'),
+(7, '001', 'C'),
+(8, '002', 'C'),
+(9, '003', 'C'),
+(10, '001', 'D'),
+(11, '001', 'D'),
+(12, '002', 'D'),
+(13, 'dtf', 'A'),
+(14, 'dtf', 'jyf'),
+(15, 'dtf', '12'),
+(16, '001', 'jyf'),
+(17, '001', 'jyf'),
+(18, '001', 'E'),
+(19, '001', 'z');
 
 -- --------------------------------------------------------
 
@@ -185,7 +210,9 @@ INSERT INTO `user_log` (`log_id`, `user_id`, `user_name`, `login_date`, `logout_
 (367, 2, 'admin Bimbo', '2025-05-16 08:31:27', '2025-05-16 14:36:21'),
 (368, 2, 'admin Bimbo', '2025-05-16 08:36:36', NULL),
 (369, 2, 'admin Bimbo', '2025-05-16 09:15:24', '2025-05-16 15:24:11'),
-(370, 2, 'admin Bimbo', '2025-05-19 07:03:56', NULL);
+(370, 2, 'admin Bimbo', '2025-05-19 07:03:56', NULL),
+(371, 2, 'admin Bimbo', '2025-05-20 02:38:04', NULL),
+(372, 2, 'admin Bimbo', '2025-05-20 03:41:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -259,10 +286,16 @@ ALTER TABLE `user_tbl`
 --
 
 --
+-- AUTO_INCREMENT for table `cabinet_tbl`
+--
+ALTER TABLE `cabinet_tbl`
+  MODIFY `cabinet_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
 -- AUTO_INCREMENT for table `document_tbl`
 --
 ALTER TABLE `document_tbl`
-  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `file_tbl`
@@ -274,7 +307,7 @@ ALTER TABLE `file_tbl`
 -- AUTO_INCREMENT for table `user_log`
 --
 ALTER TABLE `user_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=371;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=373;
 
 --
 -- AUTO_INCREMENT for table `user_tbl`
