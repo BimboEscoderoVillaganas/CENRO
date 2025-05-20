@@ -99,7 +99,7 @@ $result = $conn->query($sql);
     <li class="sidebar-header title" style="font-weight: bold; color: gray;">
         Key Performance Indicator
     </li>
-    <li class="sidebar-item active2">
+    <li class="sidebar-item">
         <a href="dashboard.php" class="sidebar-link">
             <i class="fa-solid fa-chart-line pe-2"></i>
             Dashboard
@@ -145,7 +145,7 @@ $result = $conn->query($sql);
     <li class="sidebar-header" style="font-weight: bold; color: gray;">
         Admin Action
     </li>
-    <li class="sidebar-item">
+    <li class="sidebar-item active2">
         <a href="users.php" class="sidebar-link">
             <i class="fa-solid fa-users pe-2"></i>
             Users

@@ -67,7 +67,7 @@ include '../../../src/db/db_connection.php';
     <li class="sidebar-header title" style="font-weight: bold; color: gray;">
         Key Performance Indicator
     </li>
-    <li class="sidebar-item active2">
+    <li class="sidebar-item">
         <a href="dashboard.php" class="sidebar-link">
             <i class="fa-solid fa-chart-line pe-2"></i>
             Dashboard
@@ -83,7 +83,7 @@ include '../../../src/db/db_connection.php';
             Form
         </a>
     </li>
-    <li class="sidebar-item">
+    <li class="sidebar-item active2">
         <a href="records.php" class="sidebar-link">
             <i class="fa-solid fa-folder-open pe-2"></i>
             All File Records

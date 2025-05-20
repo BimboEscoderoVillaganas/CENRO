@@ -67,7 +67,7 @@ include '../../../src/db/db_connection.php';
     <li class="sidebar-header title" style="font-weight: bold; color: gray;">
         Key Performance Indicator
     </li>
-    <li class="sidebar-item active2">
+    <li class="sidebar-item">
         <a href="dashboard.php" class="sidebar-link">
             <i class="fa-solid fa-chart-line pe-2"></i>
             Dashboard
@@ -95,7 +95,7 @@ include '../../../src/db/db_connection.php';
             Permanent Records
         </a>
     </li>
-    <li class="sidebar-item">
+    <li class="sidebar-item active2">
         <a href="archive_queue.php" class="sidebar-link">
             <i class="fa-solid fa-clock-rotate-left pe-2"></i>
             Archive Queue

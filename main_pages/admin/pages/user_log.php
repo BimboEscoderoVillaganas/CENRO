@@ -65,7 +65,7 @@
     <li class="sidebar-header title" style="font-weight: bold; color: gray;">
         Key Performance Indicator
     </li>
-    <li class="sidebar-item active2">
+    <li class="sidebar-item">
         <a href="dashboard.php" class="sidebar-link">
             <i class="fa-solid fa-chart-line pe-2"></i>
             Dashboard
@@ -117,7 +117,7 @@
             Users
         </a>
     </li>
-    <li class="sidebar-item">
+    <li class="sidebar-item active2">
         <a href="user_log.php" class="sidebar-link">
             <i class="fa-solid fa-file-lines pe-2"></i>
             User Log
