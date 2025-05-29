@@ -203,6 +203,13 @@ $result = $conn->query($sql);
     </button>
 </div>
 
+<?php if (isset($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> Document was successfully deleted and moved to archive.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
     <div class="table-responsive">
     <table class="table table-bordered table-striped table-sm small align-middle">
         <thead class="table-dark text-center">
@@ -224,18 +231,19 @@ $result = $conn->query($sql);
 
         <tbody>
         <?php
-        $query = "SELECT d.document_id, f.file_name, d.document_number, d.approving_authority, 
-                         d.document_type, d.filed_by, d.retention_schedule, d.access_level, 
-                         d.remarks, d.date_created, d.status
-                  FROM document_tbl d
-                  LEFT JOIN file_tbl f ON d.document_id = f.document_id
-                  ORDER BY d.date_created DESC";
+$query = "SELECT d.document_id, f.file_name, d.document_number, d.approving_authority, 
+                 d.document_type, d.filed_by, d.retention_schedule, d.access_level, 
+                 d.remarks, d.date_created, d.status
+          FROM document_tbl d
+          LEFT JOIN file_tbl f ON d.document_id = f.document_id
+          WHERE d.deleted <> 'yes' OR d.deleted IS NULL
+          ORDER BY d.date_created DESC";
 
-        $result = mysqli_query($conn, $query);
+$result = mysqli_query($conn, $query);
 
-        if ($result && mysqli_num_rows($result) > 0):
-            while ($row = mysqli_fetch_assoc($result)):
-        ?>
+if ($result && mysqli_num_rows($result) > 0):
+    while ($row = mysqli_fetch_assoc($result)):
+?>
                 <tr>
                     <td><?= htmlspecialchars($row['document_id']) ?></td>
                     <td><?= htmlspecialchars($row['file_name']) ?></td>
@@ -253,12 +261,29 @@ $result = $conn->query($sql);
                             <i class="bi bi-eye"></i>
                         </a>
 
-                        <a href="edit_document.php?id=<?= urlencode($row['document_id']) ?>" class="btn btn-sm btn-warning" title="Edit">
+                        <button class="btn btn-sm btn-warning edit-btn" 
+                                data-id="<?= $row['document_id'] ?>" 
+                                data-file_name="<?= htmlspecialchars($row['file_name']) ?>"
+                                data-document_number="<?= htmlspecialchars($row['document_number']) ?>"
+                                data-approving_authority="<?= htmlspecialchars($row['approving_authority']) ?>"
+                                data-document_type="<?= htmlspecialchars($row['document_type']) ?>"
+                                data-filed_by="<?= htmlspecialchars($row['filed_by']) ?>"
+                                data-retention_schedule="<?= htmlspecialchars($row['retention_schedule']) ?>"
+                                data-access_level="<?= htmlspecialchars($row['access_level']) ?>"
+                                data-remarks="<?= htmlspecialchars($row['remarks']) ?>"
+                                data-status="<?= htmlspecialchars($row['status']) ?>"
+                                data-bs-toggle="modal" data-bs-target="#editModal"
+                                title="Edit">
                             <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="delete_document.php?id=<?= urlencode($row['document_id']) ?>" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?');">
+                        </button>
+
+                        <a href="delete_document.php?id=<?= urlencode($row['document_id']) ?>" 
+                            class="btn btn-sm btn-danger" 
+                            title="Delete" 
+                            onclick="return confirm('Are you sure you want to delete this document? All files and data associated with this document will be moved to archive. You can retrieve it anytime');">
                             <i class="bi bi-trash"></i>
                         </a>
+
                     </td>
                 </tr>
 
@@ -375,6 +400,72 @@ $result = $conn->query($sql);
   </div>
 </div>
 
+<!-- Edit Document Modal -->
+ <!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form action="update_document.php" method="POST">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Document</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body row g-3">
+          <input type="hidden" name="document_id" id="edit-document-id">
+
+          <div class="col-md-6">
+            <label class="form-label">Document Number</label>
+            <input type="text" name="document_number" id="edit-document-number" class="form-control" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Approving Authority</label>
+            <input type="text" name="approving_authority" id="edit-approving-authority" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Document Type</label>
+            <input type="text" name="document_type" id="edit-document-type" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Filed By</label>
+            <input type="text" name="filed_by" id="edit-filed-by" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Retention Schedule</label>
+            <input type="text" name="retention_schedule" id="edit-retention-schedule" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Access Level</label>
+            <input type="text" name="access_level" id="edit-access-level" class="form-control">
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">Remarks</label>
+            <textarea name="remarks" id="edit-remarks" class="form-control" rows="3"></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select name="status" id="edit-status" class="form-select">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 
 
@@ -480,6 +571,27 @@ $(document).on('click', '.view-document', function (e) {
             $('#documentViewModal').modal('show');
         }
     });
+});
+</script>
+
+<!-- script for edit document modal -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const editButtons = document.querySelectorAll('.edit-btn');
+
+  editButtons.forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.getElementById('edit-document-id').value = this.dataset.id;
+      document.getElementById('edit-document-number').value = this.dataset.document_number;
+      document.getElementById('edit-approving-authority').value = this.dataset.approving_authority;
+      document.getElementById('edit-document-type').value = this.dataset.document_type;
+      document.getElementById('edit-filed-by').value = this.dataset.filed_by;
+      document.getElementById('edit-retention-schedule').value = this.dataset.retention_schedule;
+      document.getElementById('edit-access-level').value = this.dataset.access_level;
+      document.getElementById('edit-remarks').value = this.dataset.remarks;
+      document.getElementById('edit-status').value = this.dataset.status;
+    });
+  });
 });
 </script>
 
