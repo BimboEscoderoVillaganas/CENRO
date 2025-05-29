@@ -255,11 +255,6 @@ include '../../../src/db/db_connection.php';
     <select class="form-select" id="location" name="location" required>
         <option value="">Select Location</option>
         <?php
-        // Database connection
-        $host = 'localhost';
-        $dbname = 'cenro_records_db';
-        $username = 'root';
-        $password = '';
         
         try {
             $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
