@@ -272,7 +272,7 @@ include '../../../src/db/db_connection.php';
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="retentionSchedule" class="form-label">Retention Schedule</label>
-            <input type="text" class="form-control" id="retentionSchedule" name="retentionSchedule" required>
+            <input type="date" class="form-control" id="retentionSchedule" name="retentionSchedule" required>
         </div>
         <div class="col-md-6">
             <label for="accessLevel" class="form-label">Access Level</label>
