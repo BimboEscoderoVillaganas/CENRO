@@ -1,5 +1,26 @@
 <?php
 include '../../../src/db/db_connection.php';
+
+$limit = 10; // number of records per page
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$start = ($page - 1) * $limit;
+
+// Count total records
+$countQuery = "SELECT COUNT(*) AS total FROM document_tbl";
+$countResult = mysqli_query($conn, $countQuery);
+$total = mysqli_fetch_assoc($countResult)['total'];
+$pages = ceil($total / $limit);
+
+$sql = "SELECT d.document_id, f.file_name, d.document_number, d.approving_authority, 
+                 d.document_type, d.filed_by, d.retention_schedule, d.access_level, 
+                 d.remarks, d.date_created, d.status
+          FROM document_tbl d
+          LEFT JOIN file_tbl f ON d.document_id = f.document_id
+          ORDER BY d.date_created DESC
+          LIMIT $limit OFFSET $start";
+
+
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -26,6 +47,8 @@ include '../../../src/db/db_connection.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/7.8.1/simple-statistics.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
 </head>
 <style>
 
@@ -171,8 +194,108 @@ include '../../../src/db/db_connection.php';
         <!-- Main Content Starts Here -->
 <div class="container-fluid">
     <div class="container mt-4">
-   
-    <!--content here-->
+
+    <!--search bar-->
+<div class="mb-3 d-flex">
+    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search all columns...">
+    <button type="button" id="searchBtn" class="btn btn-sm btn-primary ms-2">
+        <i class="fa fa-search"></i>
+    </button>
+</div>
+
+    <div class="table-responsive">
+    <table class="table table-bordered table-striped table-sm small align-middle">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Document ID</th>
+                <th>File Name</th>
+                <th>Document Number</th>
+                <th>Approving Authority</th>
+                <th>Document Type</th>
+                <th>Filed By</th>
+                <th>Retention Schedule</th>
+                <th>Access Level</th>
+                <th>Remarks</th>
+                <th>Date Created</th>
+                <th>Status</th>
+                <th>Action</th> <!-- New column -->
+            </tr>
+        </thead>
+
+        <tbody>
+        <?php
+        $query = "SELECT d.document_id, f.file_name, d.document_number, d.approving_authority, 
+                         d.document_type, d.filed_by, d.retention_schedule, d.access_level, 
+                         d.remarks, d.date_created, d.status
+                  FROM document_tbl d
+                  LEFT JOIN file_tbl f ON d.document_id = f.document_id
+                  ORDER BY d.date_created DESC";
+
+        $result = mysqli_query($conn, $query);
+
+        if ($result && mysqli_num_rows($result) > 0):
+            while ($row = mysqli_fetch_assoc($result)):
+        ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['document_id']) ?></td>
+                    <td><?= htmlspecialchars($row['file_name']) ?></td>
+                    <td><?= htmlspecialchars($row['document_number']) ?></td>
+                    <td><?= htmlspecialchars($row['approving_authority']) ?></td>
+                    <td><?= htmlspecialchars($row['document_type']) ?></td>
+                    <td><?= htmlspecialchars($row['filed_by']) ?></td>
+                    <td><?= htmlspecialchars($row['retention_schedule']) ?></td>
+                    <td><?= htmlspecialchars($row['access_level']) ?></td>
+                    <td><?= htmlspecialchars($row['remarks']) ?></td>
+                    <td><?= htmlspecialchars($row['date_created']) ?></td>
+                    <td><?= htmlspecialchars($row['status']) ?></td>
+                    <td class="text-center">
+                        <a href="#" class="btn btn-sm btn-primary view-document" data-id="<?= $row['document_id'] ?>" title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+
+                        <a href="edit_document.php?id=<?= urlencode($row['document_id']) ?>" class="btn btn-sm btn-warning" title="Edit">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="delete_document.php?id=<?= urlencode($row['document_id']) ?>" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?');">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+
+        <?php
+            endwhile;
+        else:
+        ?>
+            <tr>
+                <td colspan="11" class="text-center">No records found.</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+    <nav>
+    <ul class="pagination justify-content-center">
+        <?php if ($page > 1): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?= $page - 1 ?>">Previous</a>
+            </li>
+        <?php endif; ?>
+
+        <?php for ($i = 1; $i <= $pages; $i++): ?>
+            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+            </li>
+        <?php endfor; ?>
+
+        <?php if ($page < $pages): ?>
+            <li class="page-item">
+                <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
+            </li>
+        <?php endif; ?>
+    </ul>
+</nav>
+
+</div>
+
 
     
     </div>
@@ -236,6 +359,21 @@ include '../../../src/db/db_connection.php';
    
 </div>
 
+
+<!-- Document View Modal -->
+<div class="modal fade" id="documentViewModal" tabindex="-1" aria-labelledby="documentViewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="documentViewModalLabel">Document Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="documentModalBody">
+        <!-- Content loaded via AJAX -->
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -308,6 +446,44 @@ include '../../../src/db/db_connection.php';
         });
     });
 </script>
+
+<!-- script for search function -->
+<script>
+document.getElementById('searchInput').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('table tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchValue) ? '' : 'none';
+    });
+});
+</script>
+
+<!--modal for view document-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).on('click', '.view-document', function (e) {
+    e.preventDefault();
+    const docId = $(this).data('id');
+
+    $.ajax({
+        url: 'ajax_view_document.php',
+        method: 'GET',
+        data: { id: docId },
+        success: function (response) {
+            $('#documentModalBody').html(response);
+            $('#documentViewModal').modal('show');
+        },
+        error: function () {
+            $('#documentModalBody').html('<div class="alert alert-danger">Error loading document.</div>');
+            $('#documentViewModal').modal('show');
+        }
+    });
+});
+</script>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
