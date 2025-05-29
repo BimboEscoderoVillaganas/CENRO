@@ -198,12 +198,23 @@ include '../../../src/db/db_connection.php';
                     <div class="card shadow-sm border-0">
                         <div class="card-body">
                             <h4 class="mb-4 text-center text-primary">Document Information Form</h4>
+
                             <!-- Add Cabinet Button -->
-<div class="d-flex justify-content-end mb-3">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCabinetModal">
-        <i class="fa fa-plus"></i> Add Cabinet
-    </button>
-</div>
+            <div class="d-flex justify-content-end gap-2 mb-3">
+                <!-- Add Document Type Button -->
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addDocTypeModal">
+                    <i class="fa fa-plus me-1"></i> Add Document Type
+                </button>
+
+                <!-- Add Cabinet Button -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCabinetModal">
+                    <i class="fa fa-plus me-1"></i> Add Cabinet
+                </button>
+            </div>
+                            
+                            <!-- Main Form Starts Here -->
+
+
 
 <form class="form-group" method="POST" action="process_document.php" enctype="multipart/form-data">
     <div class="row mb-3">
@@ -223,9 +234,11 @@ include '../../../src/db/db_connection.php';
             <input type="text" class="form-control" id="approvingAuthority" name="approvingAuthority" required>
         </div>
         <div class="col-md-4">
-            <label for="documentType" class="form-label">Document Type</label>
-            <input type="text" class="form-control" id="documentType" name="documentType" required>
-        </div>
+  <label for="documentType" class="form-label">Document Type</label>
+  <input type="text" class="form-control" id="documentType" name="documentType" list="docSuggestions" autocomplete="off" required>
+  <datalist id="docSuggestions"></datalist>
+</div>
+
         <div class="col-md-4">
             <label for="dateCreated" class="form-label">Date Created</label>
             <input type="date" class="form-control" id="dateCreated" name="dateCreated" required>
@@ -374,6 +387,57 @@ include '../../../src/db/db_connection.php';
     </div>
 
     </div>
+
+
+    <!-- Add Document Type Modal -->
+<div class="modal fade" id="addDocTypeModal" tabindex="-1" aria-labelledby="addDocTypeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="add_document_type.php">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addDocTypeModalLabel">Add Document Type</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body row">
+          <!-- Form to add new document type -->
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="newDocumentType" class="form-label">Document Type</label>
+              <input type="text" class="form-control" name="newDocumentType" id="newDocumentType" required>
+            </div>
+            <div class="mb-3">
+              <label for="shelfLife" class="form-label">Shelf Life (years)</label>
+              <<input type="text" class="form-control" name="shelfLife" id="shelfLife" placeholder="e.g., 5 years" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+
+          <!-- List of existing document types -->
+          <div class="col-md-6">
+            <h6>Existing Document Types</h6>
+            <ul class="list-group">
+              <?php
+$stmt = $conn->query("SELECT document_type, shelf_life FROM document_type ORDER BY document_type ASC");
+echo '<ul class="list-group">';
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $type = htmlspecialchars($row['document_type']);
+    $years = htmlspecialchars($row['shelf_life']);
+    echo "<li class='list-group-item d-flex justify-content-between align-items-center'>
+            $type
+            <span class='badge bg-primary rounded-pill'>$years Year(s)</span>
+        </li>";
+}
+echo '</ul>';
+?>
+
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <br>
 <br>
@@ -683,6 +747,31 @@ function formatFileSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+  $('#documentType').on('input', function () {
+    let input = $(this).val();
+    if (input.length >= 1) {
+      $.ajax({
+        url: 'fetch_document_types.php',
+        type: 'GET',
+        data: { query: input },
+        success: function (data) {
+          const suggestions = JSON.parse(data);
+          let options = '';
+          suggestions.forEach(function (item) {
+            options += `<option value="${item}">`;
+          });
+          $('#docSuggestions').html(options);
+        }
+      });
+    }
+  });
+});
 </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
