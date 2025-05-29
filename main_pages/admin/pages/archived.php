@@ -168,9 +168,87 @@ include '../../../src/db/db_connection.php';
         <!-- Main Content Starts Here -->
 <div class="container-fluid">
     <div class="container mt-4">
-   
+   <?php
+$query = "
+    SELECT 
+        d.document_id,
+        f.file_name,
+        d.document_number,
+        d.approving_authority,
+        d.document_type,
+        d.filed_by,
+        d.retention_schedule,
+        d.access_level,
+        d.remarks,
+        d.date_created,
+        d.status
+    FROM 
+        document_tbl d
+    LEFT JOIN 
+        file_tbl f ON d.document_id = f.document_id
+    WHERE 
+        d.deleted = 'yes'
+";
 
-    <h1>Archived</h1>
+$result = mysqli_query($conn, $query);
+
+echo '<div class="table-responsive">';
+echo '<table class="table table-bordered table-striped table-sm small align-middle">';
+echo '<thead class="table-dark text-center">
+        <tr>
+            <th>Document ID</th>
+            <th>File Name</th>
+            <th>Document Number</th>
+            <th>Approving Authority</th>
+            <th>Document Type</th>
+            <th>Filed By</th>
+            <th>Retention Schedule</th>
+            <th>Access Level</th>
+            <th>Remarks</th>
+            <th>Date Created</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+      </thead><tbody>';
+
+if (mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo '<tr>
+                <td>' . htmlspecialchars($row['document_id']) . '</td>
+                <td>' . htmlspecialchars($row['file_name']) . '</td>
+                <td>' . htmlspecialchars($row['document_number']) . '</td>
+                <td>' . htmlspecialchars($row['approving_authority']) . '</td>
+                <td>' . htmlspecialchars($row['document_type']) . '</td>
+                <td>' . htmlspecialchars($row['filed_by']) . '</td>
+                <td>' . htmlspecialchars($row['retention_schedule']) . '</td>
+                <td>' . htmlspecialchars($row['access_level']) . '</td>
+                <td>' . htmlspecialchars($row['remarks']) . '</td>
+                <td>' . htmlspecialchars($row['date_created']) . '</td>
+                <td>' . htmlspecialchars($row['status']) . '</td>
+                <td>
+                    <form method="post" action="retrieve_document.php" onsubmit="return confirm(\'Are you sure you want to retrieve this document?\');" class="d-inline">
+                        <input type="hidden" name="document_id" value="' . $row['document_id'] . '">
+                        <button type="submit" class="btn btn-success btn-sm" title="Retrieve Document">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </form>
+                </td>
+              </tr>';
+    }
+} else {
+    echo '<tr><td colspan="12" class="text-center">No archived documents found.</td></tr>';
+}
+
+echo '</tbody></table>';
+echo '</div>';
+
+?>
+
+
+    <?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success']); ?></div>
+<?php endif; ?>
+
 
     </div>
 
