@@ -281,12 +281,13 @@ if ($result && mysqli_num_rows($result) > 0):
                             <i class="bi bi-pencil-square"></i>
                         </button>
 
-                        <a href="delete_document.php?id=<?= urlencode($row['document_id']) ?>" 
+                        <!--uncomment the following line to enable delete functionality-->
+                        <!--<a href="delete_document.php?id=<?= urlencode($row['document_id']) ?>" 
                             class="btn btn-sm btn-danger" 
                             title="Delete" 
                             onclick="return confirm('Are you sure you want to delete this document? All files and data associated with this document will be moved to archive. You can retrieve it anytime');">
                             <i class="bi bi-trash"></i>
-                        </a>
+                        </a>-->
 
                     </td>
                 </tr>
