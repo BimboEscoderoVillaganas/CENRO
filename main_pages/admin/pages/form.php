@@ -403,7 +403,7 @@ include '../../../src/db/db_connection.php';
             </div>
             <div class="mb-3">
               <label for="shelfLife" class="form-label">Shelf Life (years)</label>
-              <<input type="text" class="form-control" name="shelfLife" id="shelfLife" placeholder="e.g., 5 years" required>
+              <input type="text" class="form-control" name="shelfLife" id="shelfLife" placeholder="e.g., 5 (for 5 years)" required>
             </div>
             <button type="submit" class="btn btn-primary">Save</button>
           </div>
