@@ -278,10 +278,11 @@ include '../../../src/db/db_connection.php';
     </div>
 
     <div class="row mb-3">
-        <div class="col-md-6">
+        <!--uncomment this section if you want to include Retention Schedule-->
+        <!--<div class="col-md-6">
             <label for="retentionSchedule" class="form-label">Retention Schedule</label>
             <input type="date" class="form-control" id="retentionSchedule" name="retentionSchedule" required>
-        </div>
+        </div>-->
         <div class="col-md-6">
             <label for="accessLevel" class="form-label">Access Level</label>
             <select class="form-select" id="accessLevel" name="accessLevel" required>
@@ -769,6 +770,23 @@ $(document).ready(function () {
 });
 </script>
 
+
+<!-- Script to fetch document types for datalist -->
+<script>
+// Populate document type suggestions
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('get_document_types.php')
+        .then(response => response.json())
+        .then(data => {
+            const datalist = document.getElementById('docSuggestions');
+            data.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.document_type;
+                datalist.appendChild(option);
+            });
+        });
+});
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>

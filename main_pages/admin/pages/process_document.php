@@ -2,12 +2,6 @@
 session_start();
 include '../../../src/db/db_connection.php';
 
-// Database configuration
-$host = 'localhost';
-$dbname = 'cenro_records_db';
-$username = 'root';
-$password = '';
-
 // File upload configuration
 $uploadDir = '../../../uploads/documents/';
 $maxFileSize = 10 * 1024 * 1024; // 10MB
@@ -18,46 +12,60 @@ try {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->beginTransaction();
 
-    // Get and validate form data
+    // Validate required fields
     $requiredFields = [
         'documentTitle', 'documentNumber', 'approvingAuthority',
         'documentType', 'dateCreated', 'filedBy', 'location',
-        'retentionSchedule', 'accessLevel', 'description'
+        'accessLevel', 'description'
     ];
 
     foreach ($requiredFields as $field) {
         if (empty($_POST[$field])) {
-            throw new Exception("Required field '$field' is missing");
+            throw new Exception("Required field '$field' is missing or empty");
         }
     }
 
-    // Insert document
-    $stmt = $conn->prepare("INSERT INTO document_tbl (
-        document_number, 
-        description, 
-        approving_authority, 
-        document_type, 
-        date_created, 
-        filed_by, 
-        location, 
-        retention_schedule, 
-        access_level, 
-        remarks,
-        status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')");
+    // Get shelf life from document_type table
+    $stmt = $conn->prepare("SELECT shelf_life FROM document_type WHERE document_type = ?");
+    $stmt->execute([$_POST['documentType']]);
+    $shelfLife = $stmt->fetchColumn();
 
-    $stmt->execute([
-        $_POST['documentNumber'],
-        $_POST['description'],
-        $_POST['approvingAuthority'],
-        $_POST['documentType'],
-        $_POST['dateCreated'],
-        $_POST['filedBy'],
-        $_POST['location'],
-        $_POST['retentionSchedule'],
-        $_POST['accessLevel'],
-        $_POST['remarks'] ?? null
-    ]);
+    if ($shelfLife === false) {
+        throw new Exception("Document type '{$_POST['documentType']}' not found in database");
+    }
+
+    // Calculate retention schedule
+    $dateCreated = new DateTime($_POST['dateCreated']);
+    $retentionSchedule = 'PERMANENT'; // Default value
+
+    if ($shelfLife !== 'PERMANENT' && is_numeric($shelfLife)) {
+        $years = (int)$shelfLife;
+        $dateCreated->add(new DateInterval("P{$years}Y"));
+        $retentionSchedule = $dateCreated->format('Y-m-d');
+    }
+
+    // Prepare document data
+    $documentData = [
+        'document_number' => $_POST['documentNumber'],
+        'description' => $_POST['description'],
+        'approving_authority' => $_POST['approvingAuthority'],
+        'document_type' => $_POST['documentType'],
+        'date_created' => $_POST['dateCreated'],
+        'filed_by' => $_POST['filedBy'],
+        'location' => $_POST['location'],
+        'retention_schedule' => $retentionSchedule,
+        'access_level' => $_POST['accessLevel'],
+        'remarks' => $_POST['remarks'] ?? null,
+        'status' => 'Active',
+        'deleted' => 'no'
+    ];
+
+    // Insert document
+    $columns = implode(', ', array_keys($documentData));
+    $placeholders = implode(', ', array_fill(0, count($documentData), '?'));
+    
+    $stmt = $conn->prepare("INSERT INTO document_tbl ($columns) VALUES ($placeholders)");
+    $stmt->execute(array_values($documentData));
 
     $documentId = $conn->lastInsertId();
     $uploadedFiles = [];
@@ -80,19 +88,21 @@ try {
 
             // Validate file
             if ($fileError !== UPLOAD_ERR_OK) {
-                throw new Exception("Error uploading file: $fileName");
+                throw new Exception("Error uploading file: $fileName (Error code: $fileError)");
             }
 
             if ($fileSize > $maxFileSize) {
-                throw new Exception("File $fileName exceeds maximum size limit");
+                throw new Exception("File $fileName exceeds maximum size limit of 10MB");
             }
 
             if (!in_array($fileType, $allowedTypes)) {
-                throw new Exception("File type $fileType is not allowed");
+                throw new Exception("File type $fileType is not allowed for $fileName");
             }
 
-            // Generate unique filename
-            $newFileName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9\.\-_]/', '', $fileName);
+            // Generate unique filename while preserving extension
+            $fileBaseName = pathinfo($fileName, PATHINFO_FILENAME);
+            $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+            $newFileName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9\-_]/', '', $fileBaseName) . '.' . $fileExt;
             $destination = $uploadDir . $newFileName;
 
             // Move uploaded file
@@ -105,7 +115,7 @@ try {
                 document_id, 
                 file_name, 
                 date_added
-            ) VALUES (?, ?, NOW())");
+            ) VALUES (?, ?, CURDATE())");
 
             if (!$fileStmt->execute([$documentId, $newFileName])) {
                 // Delete the uploaded file if DB insert fails
@@ -121,11 +131,11 @@ try {
 
     // Prepare success message
     $fileCount = count($uploadedFiles);
-    $fileMessage = $fileCount > 0 ? " with $fileCount file" . ($fileCount > 1 ? 's' : '') : '';
+    $fileMessage = $fileCount > 0 ? " with $fileCount attached file" . ($fileCount > 1 ? 's' : '') : '';
     
     $_SESSION['alert'] = [
         'type' => 'success',
-        'message' => "Document saved successfully$fileMessage!"
+        'message' => "Document #{$documentData['document_number']} created successfully$fileMessage! Retention schedule: $retentionSchedule"
     ];
 
 } catch (PDOException $e) {
