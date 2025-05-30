@@ -234,11 +234,10 @@ include '../../../src/db/db_connection.php';
             <input type="text" class="form-control" id="approvingAuthority" name="approvingAuthority" required>
         </div>
         <div class="col-md-4">
-  <label for="documentType" class="form-label">Document Type</label>
-  <input type="text" class="form-control" id="documentType" name="documentType" list="docSuggestions" autocomplete="off" required>
-  <datalist id="docSuggestions"></datalist>
-</div>
-
+            <label for="documentType" class="form-label">Document Type</label>
+            <input type="text" class="form-control" id="documentType" name="documentType" list="docSuggestions" autocomplete="off" required>
+            <datalist id="docSuggestions"></datalist>
+        </div>
         <div class="col-md-4">
             <label for="dateCreated" class="form-label">Date Created</label>
             <input type="date" class="form-control" id="dateCreated" name="dateCreated" required>
@@ -248,41 +247,35 @@ include '../../../src/db/db_connection.php';
     <div class="row mb-3">
         <div class="col-md-6">
             <label for="filedBy" class="form-label">Filed By</label>
-            <input type="text" class="form-control" id="filedBy" name="filedBy" required>
+            <input type="text" class="form-control" id="filedBy" name="filedBy" value="<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : ''; ?>" readonly required>
         </div>
         <div class="col-md-6">
-    <label for="location" class="form-label">Location</label>
-    <select class="form-select" id="location" name="location" required>
-        <option value="">Select Location</option>
-        <?php
-        
-        try {
-            $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            // Fetch cabinet locations
-            $stmt = $conn->query("SELECT cabinet_number, cabinet_code, cabinet_location FROM cabinet_tbl ORDER BY cabinet_location, cabinet_number");
-            $cabinets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            foreach ($cabinets as $cabinet) {
-                $displayText = htmlspecialchars($cabinet['cabinet_location']) . '-' . htmlspecialchars($cabinet['cabinet_code']);
-                $value = htmlspecialchars($cabinet['cabinet_number']);
-                echo "<option value='$value'>$displayText</option>";
-            }
-        } catch(PDOException $e) {
-            echo "<option value=''>Error loading locations</option>";
-        }
-        ?>
-    </select>
-</div>
+            <label for="location" class="form-label">Location</label>
+            <select class="form-select" id="location" name="location" required>
+                <option value="">Select Location</option>
+                <?php
+                try {
+                    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    
+                    // Fetch cabinet locations
+                    $stmt = $conn->query("SELECT cabinet_number, cabinet_code, cabinet_location FROM cabinet_tbl ORDER BY cabinet_location, cabinet_number");
+                    $cabinets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    foreach ($cabinets as $cabinet) {
+                        $displayText = htmlspecialchars($cabinet['cabinet_location']) . '-' . htmlspecialchars($cabinet['cabinet_code']);
+                        $value = htmlspecialchars($cabinet['cabinet_number']);
+                        echo "<option value='$value'>$displayText</option>";
+                    }
+                } catch(PDOException $e) {
+                    echo "<option value=''>Error loading locations</option>";
+                }
+                ?>
+            </select>
+        </div>
     </div>
 
     <div class="row mb-3">
-        <!--uncomment this section if you want to include Retention Schedule-->
-        <!--<div class="col-md-6">
-            <label for="retentionSchedule" class="form-label">Retention Schedule</label>
-            <input type="date" class="form-control" id="retentionSchedule" name="retentionSchedule" required>
-        </div>-->
         <div class="col-md-6">
             <label for="accessLevel" class="form-label">Access Level</label>
             <select class="form-select" id="accessLevel" name="accessLevel" required>
@@ -304,48 +297,45 @@ include '../../../src/db/db_connection.php';
             <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
         </div>
     </div>
-
-    
     
     <!-- File Upload Section with Multiple Files Support -->
-<div class="row mb-3">
-    <div class="col-md-12">
-        <label class="form-label">
-    File Attachments (<span class="text-danger">Optional</span>)
-</label>
-        <div class="input-group mb-2">
-            <input type="file" class="form-control" id="fileUpload" name="documentFiles[]" style="display: none;" 
-                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
-            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('fileUpload').click()">
-                <i class="fas fa-paperclip"></i> Choose Files
-            </button>
-            <input type="text" class="form-control" id="fileNameDisplay" placeholder="No files chosen" readonly>
-            <button type="button" class="btn btn-outline-danger" id="clearFileBtn" style="display: none;">
-                <i class="fas fa-times"></i> Clear All
-            </button>
-        </div>
-        
-        <!-- Files Preview Container -->
-        <div id="filesPreviewContainer" class="mt-2"></div>
-        
-        <!-- Capacity Indicator -->
-        <div class="capacity-indicator mt-2">
-            <div class="d-flex justify-content-between">
-                <small class="text-muted">Allowed formats: PDF, DOC, DOCX, JPG, PNG</small>
-                <small id="remainingCapacity" class="text-muted">10MB available</small>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label class="form-label">
+                File Attachments (<span class="text-danger">Optional</span>)
+            </label>
+            <div class="input-group mb-2">
+                <input type="file" class="form-control" id="fileUpload" name="documentFiles[]" style="display: none;" 
+                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('fileUpload').click()">
+                    <i class="fas fa-paperclip"></i> Choose Files
+                </button>
+                <input type="text" class="form-control" id="fileNameDisplay" placeholder="No files chosen" readonly>
+                <button type="button" class="btn btn-outline-danger" id="clearFileBtn" style="display: none;">
+                    <i class="fas fa-times"></i> Clear All
+                </button>
             </div>
-            <div class="progress" style="height: 5px;">
-                <div id="fileSizeProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+            
+            <!-- Files Preview Container -->
+            <div id="filesPreviewContainer" class="mt-2"></div>
+            
+            <!-- Capacity Indicator -->
+            <div class="capacity-indicator mt-2">
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">Allowed formats: PDF, DOC, DOCX, JPG, PNG</small>
+                    <small id="remainingCapacity" class="text-muted">10MB available</small>
+                </div>
+                <div class="progress" style="height: 5px;">
+                    <div id="fileSizeProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <div class="text-end">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </form>
-
 
     <!-- Add Cabinet Modal -->
 <div class="modal fade" id="addCabinetModal" tabindex="-1" aria-labelledby="addCabinetModalLabel" aria-hidden="true">
@@ -770,6 +760,23 @@ $(document).ready(function () {
 });
 </script>
 
+
+<!-- Script to fetch document types for datalist -->
+<script>
+// Populate document type suggestions
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('get_document_types.php')
+        .then(response => response.json())
+        .then(data => {
+            const datalist = document.getElementById('docSuggestions');
+            data.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.document_type;
+                datalist.appendChild(option);
+            });
+        });
+});
+</script>
 
 <!-- Script to fetch document types for datalist -->
 <script>
