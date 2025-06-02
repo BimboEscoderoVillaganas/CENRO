@@ -181,11 +181,16 @@ $query = "
         d.access_level,
         d.remarks,
         d.date_created,
-        d.status
+        d.status,
+        d.location,
+        c.cabinet_code,
+        c.cabinet_location
     FROM 
         document_tbl d
     LEFT JOIN 
         file_tbl f ON d.document_id = f.document_id
+    LEFT JOIN
+        cabinet_tbl c ON d.location = c.cabinet_number
     WHERE 
         d.deleted = 'yes'
 ";
@@ -196,7 +201,7 @@ echo '<div class="table-responsive">';
 echo '<table class="table table-bordered table-striped table-sm small align-middle">';
 echo '<thead class="table-dark text-center">
         <tr>
-            <th>Document ID</th>
+            <th>Cabinet</th>
             <th>File Name</th>
             <th>Document Number</th>
             <th>Approving Authority</th>
@@ -213,8 +218,13 @@ echo '<thead class="table-dark text-center">
 
 if (mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
+        // Combine cabinet location and code
+        $cabinet_info = (!empty($row['cabinet_location']) && !empty($row['cabinet_code'])) 
+                      ? htmlspecialchars($row['cabinet_location'] . '-' . $row['cabinet_code'])
+                      : 'N/A';
+        
         echo '<tr>
-                <td>' . htmlspecialchars($row['document_id']) . '</td>
+                <td>' . $cabinet_info . '</td>
                 <td>' . htmlspecialchars($row['file_name']) . '</td>
                 <td>' . htmlspecialchars($row['document_number']) . '</td>
                 <td>' . htmlspecialchars($row['approving_authority']) . '</td>

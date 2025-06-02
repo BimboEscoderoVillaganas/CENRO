@@ -214,7 +214,7 @@ $result = $conn->query($sql);
     <table class="table table-bordered table-striped table-sm small align-middle">
         <thead class="table-dark text-center">
             <tr>
-                <th>Document ID</th>
+                <th>Cabinet</th>
                 <th>File Name</th>
                 <th>Document Number</th>
                 <th>Approving Authority</th>
@@ -233,9 +233,11 @@ $result = $conn->query($sql);
         <?php
 $query = "SELECT d.document_id, f.file_name, d.document_number, d.approving_authority, 
                  d.document_type, d.filed_by, d.retention_schedule, d.access_level, 
-                 d.remarks, d.date_created, d.status
+                 d.remarks, d.date_created, d.status, d.location,
+                 c.cabinet_code, c.cabinet_location
           FROM document_tbl d
           LEFT JOIN file_tbl f ON d.document_id = f.document_id
+          LEFT JOIN cabinet_tbl c ON d.location = c.cabinet_number
           WHERE (d.deleted <> 'yes' OR d.deleted IS NULL)
             AND d.retention_schedule = 'Permanent'
           ORDER BY d.date_created DESC";
@@ -244,12 +246,14 @@ $result = mysqli_query($conn, $query);
 
 if ($result && mysqli_num_rows($result) > 0):
     while ($row = mysqli_fetch_assoc($result)):
+        // Combine cabinet location and code
+        $cabinet_info = $row['cabinet_location'] && $row['cabinet_code'] 
+                      ? $row['cabinet_location'] . '-' . $row['cabinet_code'] 
+                      : 'N/A';
 ?>
 
-
-
                 <tr>
-                    <td><?= htmlspecialchars($row['document_id']) ?></td>
+                    <td><?= htmlspecialchars($cabinet_info) ?></td>
                     <td><?= htmlspecialchars($row['file_name']) ?></td>
                     <td><?= htmlspecialchars($row['document_number']) ?></td>
                     <td><?= htmlspecialchars($row['approving_authority']) ?></td>
