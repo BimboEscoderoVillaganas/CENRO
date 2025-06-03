@@ -605,42 +605,133 @@ document.addEventListener('DOMContentLoaded', function () {
 <!-- Add these scripts at the bottom -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script>
-// Print functionality
+// Print functionality with logos and borders
 document.getElementById('printBtn').addEventListener('click', function() {
     const table = document.getElementById('dataTable');
     const win = window.open('', '', 'height=700,width=700');
+    
     win.document.write('<html><head><title>Document Records</title>');
     win.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">');
-    win.document.write('<style>table {width: 100%;} th {background-color: #212529!important; color: white!important;}</style>');
+    win.document.write(`
+        <style>
+            body { margin: 20px; }
+            .header-container { 
+                position: relative; 
+                margin-bottom: 30px;
+                padding-top: 10px;
+            }
+            .logo-left { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                height: 80px;
+                margin-right: 20px;
+            }
+            .logo-right { 
+                position: absolute; 
+                right: 0; 
+                top: 0; 
+                height: 80px;
+                margin-left: 20px;
+            }
+            .title {
+                margin: 0 auto;
+                width: 60%;
+                text-align: center;
+                padding-top: 10px;
+            }
+            table {
+                width: 100%;
+                border: 2px solid #000;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th, td {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #212529 !important;
+                color: white !important;
+            }
+        </style>
+    `);
     win.document.write('</head><body>');
-    win.document.write('<h4 class="text-center mb-4">Document Records</h4>');
-    win.document.write(table.outerHTML);
+    
+    // Header with logos
+    win.document.write(`
+        <div class="header-container">
+            <img src="../../../assets/images/bp.png" class="logo-left">
+            <div class="title"><h4>Document Records</h4></div>
+            <img src="../../../assets/images/logo.png" class="logo-right"> <br><br>
+        </div>
+    `);
+    
+    // Create a new table with only the specified columns
+    const allowedColumns = ['Cabinet', 'File Name', 'Document Number', 'Approving Authority', 
+                          'Document Type', 'Filed By', 'Date Created', 'Retention Schedule', 
+                          'Access Level', 'Remarks'];
+    
+    win.document.write('<table>');
+    win.document.write('<thead><tr>');
+    
+    // Filter and write headers
+    table.querySelectorAll('th').forEach(th => {
+        if (allowedColumns.includes(th.textContent)) {
+            win.document.write(`<th>${th.textContent}</th>`);
+        }
+    });
+    win.document.write('</tr></thead>');
+    
+    // Filter and write data rows
+    win.document.write('<tbody>');
+    table.querySelectorAll('tbody tr').forEach(row => {
+        win.document.write('<tr>');
+        row.querySelectorAll('td').forEach((td, index) => {
+            const headerText = table.querySelectorAll('th')[index].textContent;
+            if (allowedColumns.includes(headerText)) {
+                win.document.write(`<td>${td.textContent}</td>`);
+            }
+        });
+        win.document.write('</tr>');
+    });
+    win.document.write('</tbody></table>');
+    
     win.document.write('</body></html>');
     win.document.close();
     win.print();
 });
 
-// Download CSV functionality
+// Download CSV functionality with only specified columns
 document.getElementById('downloadBtn').addEventListener('click', function() {
     const table = document.getElementById('dataTable');
     const rows = table.querySelectorAll('tr');
     let csv = [];
     
-    // Get headers
+    // Specify which columns to include
+    const includedColumns = ['Cabinet', 'File Name', 'Document Number', 'Approving Authority', 
+                            'Document Type', 'Filed By', 'Date Created', 'Retention Schedule', 
+                            'Access Level', 'Remarks'];
+    
+    // Get headers (only included columns)
     const headers = [];
     table.querySelectorAll('th').forEach(th => {
-        if (th.textContent !== 'Action') { // Skip Action column
+        if (includedColumns.includes(th.textContent)) {
             headers.push(th.textContent);
         }
     });
     csv.push(headers.join(','));
     
-    // Get data rows
+    // Get data rows (only included columns)
     rows.forEach(row => {
         const rowData = [];
         row.querySelectorAll('td').forEach((td, index) => {
-            if (index !== row.cells.length - 1) { // Skip last column (Action)
+            const headerText = table.querySelectorAll('th')[index].textContent;
+            if (includedColumns.includes(headerText)) {
                 rowData.push('"' + td.textContent.replace(/"/g, '""') + '"');
             }
         });
