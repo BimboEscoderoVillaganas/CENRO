@@ -202,6 +202,16 @@ $result = $conn->query($sql);
         <i class="fa fa-search"></i>
     </button>
 </div>
+<div>
+        <button id="printBtn" class="btn btn-sm btn-secondary me-2">
+            <i class="bi bi-printer"></i> Print
+        </button>
+        <button id="downloadBtn" class="btn btn-sm btn-success">
+            <i class="bi bi-download"></i> Download CSV
+        </button>
+    </div>
+    </div>
+    </div>
 
 <?php if (isset($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -211,7 +221,7 @@ $result = $conn->query($sql);
 <?php endif; ?>
 
     <div class="table-responsive">
-    <table class="table table-bordered table-striped table-sm small align-middle">
+    <table  id="dataTable" class="table table-bordered table-striped table-sm small align-middle">
         <thead class="table-dark text-center">
             <tr>
                 <th>Cabinet</th>  <!-- Changed from Document ID to Cabinet -->
@@ -268,7 +278,7 @@ if ($result && mysqli_num_rows($result) > 0):
 ?>
                 <tr>
                     <td><?= $cabinetDisplay ?></td>  <!-- Display cabinet code-location -->
-                    <td><?= htmlspecialchars($row['file_name'] ?? 'No file') ?></td>
+                    <td><?= htmlspecialchars($row['file_name'] ?? 'No file uploaded') ?></td>
                     <td><?= htmlspecialchars($row['document_number']) ?></td>
                     <td><?= htmlspecialchars($row['approving_authority']) ?></td>
                     <td><?= htmlspecialchars($row['document_type']) ?></td>
@@ -592,7 +602,77 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<!-- Add these scripts at the bottom -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script>
+// Print functionality
+document.getElementById('printBtn').addEventListener('click', function() {
+    const table = document.getElementById('dataTable');
+    const win = window.open('', '', 'height=700,width=700');
+    win.document.write('<html><head><title>Document Records</title>');
+    win.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">');
+    win.document.write('<style>table {width: 100%;} th {background-color: #212529!important; color: white!important;}</style>');
+    win.document.write('</head><body>');
+    win.document.write('<h4 class="text-center mb-4">Document Records</h4>');
+    win.document.write(table.outerHTML);
+    win.document.write('</body></html>');
+    win.document.close();
+    win.print();
+});
 
+// Download CSV functionality
+document.getElementById('downloadBtn').addEventListener('click', function() {
+    const table = document.getElementById('dataTable');
+    const rows = table.querySelectorAll('tr');
+    let csv = [];
+    
+    // Get headers
+    const headers = [];
+    table.querySelectorAll('th').forEach(th => {
+        if (th.textContent !== 'Action') { // Skip Action column
+            headers.push(th.textContent);
+        }
+    });
+    csv.push(headers.join(','));
+    
+    // Get data rows
+    rows.forEach(row => {
+        const rowData = [];
+        row.querySelectorAll('td').forEach((td, index) => {
+            if (index !== row.cells.length - 1) { // Skip last column (Action)
+                rowData.push('"' + td.textContent.replace(/"/g, '""') + '"');
+            }
+        });
+        if (rowData.length > 0) {
+            csv.push(rowData.join(','));
+        }
+    });
+    
+    // Download CSV file
+    const csvContent = csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'document_records_' + new Date().toISOString().slice(0, 10) + '.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+
+// Existing search functionality remains the same
+document.getElementById('searchInput').addEventListener('input', function () {
+    const searchValue = this.value.toLowerCase();
+    const rows = document.querySelectorAll('table tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchValue) ? '' : 'none';
+    });
+});
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
