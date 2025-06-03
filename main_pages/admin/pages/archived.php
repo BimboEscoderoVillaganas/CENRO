@@ -186,6 +186,9 @@ include '../../../src/db/db_connection.php';
         </div>
         <br><br>
 
+        <?php if (isset($_GET['success'])): ?>
+        <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success']); ?></div>
+        <?php endif; ?>
         <?php
         // Pagination variables
         $records_per_page = 10;
@@ -332,9 +335,6 @@ include '../../../src/db/db_connection.php';
         echo '</nav>';
         ?>
 
-        <?php if (isset($_GET['success'])): ?>
-        <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success']); ?></div>
-        <?php endif; ?>
     </div>
 </div>
 

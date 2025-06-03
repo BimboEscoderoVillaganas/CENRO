@@ -212,9 +212,10 @@ $result = $conn->query($sql);
         </button>
     </div>
     <br><br>
-<?php if (isset($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>
+    <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Success!</strong> Document was successfully deleted and moved to archive.
+        <strong><i class="bi bi-check-circle-fill"></i> Success!</strong> 
+        <?php echo urldecode($_GET['success']); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <?php endif; ?>
@@ -422,12 +423,13 @@ if ($result && mysqli_num_rows($result) > 0):
  <!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <form action="update_document.php" method="POST">
+    <form action="deletion_function/permanent_update_document.php" method="POST">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="editModalLabel">Edit Document</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
 
         <div class="modal-body row g-3">
           <input type="hidden" name="document_id" id="edit-document-id">
