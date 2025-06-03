@@ -715,7 +715,7 @@ document.getElementById('printBtn').addEventListener('click', function() {
             <img src="../../../assets/images/bp.png" class="logo-left">
             <div class="title">
                 <h4 style="margin-bottom: 5px;">Document Management System</h4>
-                <h5>${currentFilteredRows.length > 0 ? 'Filtered Records' : 'All Records'}</h5>
+                <h5>${currentFilteredRows.length > 0 ? 'All Records' : 'All Records'}</h5>
                 <p style="font-size: 12px; margin-top: 5px;">Generated on: ${new Date().toLocaleString()}</p>
                 ${document.getElementById('searchInput').value ? 
                   `<p style="font-size: 12px;">Filtered by: "${document.getElementById('searchInput').value}"</p>` : ''}

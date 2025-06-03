@@ -721,7 +721,7 @@ document.getElementById('printBtn').addEventListener('click', function() {
             <img src="../../../assets/images/bp.png" class="logo-left">
             <div class="title">
                 <h4 style="margin-bottom: 5px;">Document Management System</h4>
-                <h5>${filteredRows.length > 0 ? 'Filtered Records' : 'All Permanent Records'}</h5>
+                <h5>${filteredRows.length > 0 ? 'Filtered Permanent Records' : 'All Permanent Records'}</h5>
                 <p style="font-size: 12px; margin-top: 5px;">Generated on: ${new Date().toLocaleString()}</p>
                 ${filteredRows.length > 0 ? `<p style="font-size: 12px;">Filtered by: "${document.getElementById('searchInput').value}"</p>` : ''}
             </div>
