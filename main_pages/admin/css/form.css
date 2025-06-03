@@ -1,0 +1,25 @@
+#one-page {
+  position: relative;
+  height: 100vh; /* Full viewport height */
+  overflow: hidden;
+}
+
+#insertion_section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40%; /* Adjust as needed */
+  height: 100vh;
+  padding: 20px;
+  background-color: #fff;
+  overflow: hidden;
+  z-index: 1;
+  border-right: 1px solid #ccc;
+}
+
+#book_list {
+  margin-left: 40%; /* Same as insertion_section width */
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+}

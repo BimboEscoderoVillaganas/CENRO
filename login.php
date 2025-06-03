@@ -1,78 +1,58 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlayFull Bistro - Login</title>
-    <link rel="stylesheet" href="assets/css/login.css">
-    <!-- Add Bootstrap for Modal -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="src/css/login.css">
+    <link rel="stylesheet" href="src/css/nav_active.css">
+    <link href="src/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="src/css/style.min.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <title>Login</title>
+    <style>
+        .form-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-form">
-            <h2>Login</h2>
-            <?php if (!empty($errorMessage)) { ?>
-                <div class="alert alert-danger" role="alert">
-                    <?php echo $errorMessage; ?>
+    <div id="loader-wrapper">
+        <div id="loader"></div>        
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+    </div>
+    <div class="form-container">
+    <?php
+    session_start();
+    if (isset($_SESSION['error'])) {
+        echo "<div class='alert alert-danger text-center' role='alert'>" . $_SESSION['error'] . "</div>";
+        unset($_SESSION['error']); // Clear error message after displaying
+    }
+    ?>
+        <div class="form">
+            <form action="src/db/login_process.php" method="post">
+                <div id="emailHelp" class="form-text">Please use your organizational account provided by the admin</div>
+                <div class="mb-3">
+                    <label for="username" class="form-label">User Name</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
                 </div>
-            <?php } ?>
-            <form action="login.php" method="post">
-                <div class="input-group">
-                    <label>Username or Phone Number:</label>
-                    <input type="text" name="username_or_phone" required class="<?php echo (isset($errorFields) && $errorFields == 'username_or_phone') ? 'is-invalid' : ''; ?>">
-                    <?php if (isset($errorFields) && $errorFields == 'username_or_phone') { ?>
-                        <div class="invalid-feedback">This username or phone number does not match.</div>
-                    <?php } ?>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <div class="input-group">
-                    <label>Password:</label>
-                    <input type="password" name="password" required class="<?php echo (isset($errorFields) && $errorFields == 'password') ? 'is-invalid' : ''; ?>">
-                    <?php if (isset($errorFields) && $errorFields == 'password') { ?>
-                        <div class="invalid-feedback">The password entered is incorrect.</div>
-                    <?php } ?>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <a href="index.php" class="btn btn-secondary">Cancel</a>
                 </div>
-                <button type="submit" class="login-btn" formaction="pages/admin/dashboard.php">Login</button>
-                <button type="button" class="cancel-btn" onclick="window.location.href='index.php'">Cancel</button>
             </form>
-            <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
         </div>
     </div>
-
-    <!-- Modal for Unknown User Type Error -->
-    <?php if (isset($showModal) && $showModal) { ?>
-        <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="errorModalLabel">Error</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>It seems like there is an issue with your user type.</p>
-                        <ul>
-                            <li><strong>Username:</strong> <?php echo isset($user['username']) ? htmlspecialchars($user['username']) : ''; ?></li>
-                            <li><strong>Phone Number:</strong> <?php echo isset($user['phone_number']) ? htmlspecialchars($user['phone_number']) : ''; ?></li>
-                            <li><strong>Password:</strong> [hidden]</li>
-                        </ul>
-                        <p>Please contact support for further assistance.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-            // Show modal
-            var myModal = new bootstrap.Modal(document.getElementById('errorModal'), {
-                keyboard: false
-            });
-            myModal.show();
-        </script>
-    <?php } ?>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="src/js/plugins/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript" src="src/js/materialize.min.js"></script>
+    <script type="text/javascript" src="src/js/plugins.min.js"></script>
 </body>
 </html>
