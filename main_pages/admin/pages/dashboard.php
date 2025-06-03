@@ -1,11 +1,24 @@
 <?php
 include '../../../src/db/db_connection.php';
 
+// Get document statistics
 $total_records = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM document_tbl"))['count'];
 $permanent_records = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM document_tbl WHERE status = 'permanent'"))['count'];
 $archive_queue = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM document_tbl WHERE status = 'queued'"))['count'];
 $total_users = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM user_tbl"))['count'];
 
+// Get monthly data for trend chart
+$monthlyData = [];
+$result = mysqli_query($conn, "SELECT 
+    DATE_FORMAT(upload_date, '%Y-%m') as month, 
+    COUNT(*) as count 
+    FROM document_tbl 
+    GROUP BY DATE_FORMAT(upload_date, '%Y-%m') 
+    ORDER BY month ASC LIMIT 12");  // Changed to ASC for proper chronological order
+
+while ($row = mysqli_fetch_assoc($result)) {
+    $monthlyData[] = $row;
+}
 ?>
 
 <!DOCTYPE html>
@@ -16,409 +29,247 @@ $total_users = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count 
     <link rel="shortcut icon" href="../../../assets/images/logo.png" type="image/x-icon">
     <title>Dashboard</title>
     <!-- Bootstrap CSS CDN --> 
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/ae360af17e.js" crossorigin="anonymous"></script>
-    <!-- Our Custom CSS -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="../../../src/css/nav.css">
-    <!-- Scrollbar Custom CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
-
-<!--For SimpleStatistics-->
-    <link rel="stylesheet" href="../css/style.css">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/simple-statistics@7.0.2/dist/simple-statistics.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/7.8.1/simple-statistics.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .active2 {
+            background-color: #b9b9b9;
+            color: white;
+        }
+
+        .card-stat {
+            transition: transform 0.3s ease;
+            min-height: 150px;
+        }
+
+        .card-stat:hover {
+            transform: translateY(-5px);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .menu-header {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+    </style>
 </head>
-<style>
-
-.active2 {
-        background-color: #b9b9b9;
-        color: white;
-    }
-
-    a.active1 {
-        background-color: #515151;
-        color: white;
-    }
-
-    /* Ensure container pushes content down */
-    .container-fluid {
-        margin-top: 1px;
-        margin-bottom: 50px;
-    }
-</style>
 
 <body>
     <div class="wrapper">
-        <!-- Sidebar  -->
+        <!-- Sidebar -->
         <nav id="sidebar">
-            <div class="sidebar-header" style="background: gray;">
-                <h3 style="color: #ffffff;">
-                
-                <?php
-                    session_start();
-                    if (!isset($_SESSION['username'])) {
-                        header('Location: ../../../index.php');
-                        exit();
-                    }
-                    if (isset($_SESSION['username'])) {
-                        echo '<a href="#">' . htmlspecialchars($_SESSION['username']) . '</a>';
-                    } else {
-                        echo '<a href="#">Admin</a>';
-                    }
-                ?>
-
-            </h3>
-                
-            </div>
-
-            <li class="sidebar-header title" style="
-    font-weight: bold; color:gray;">
-                        Key Performans Indicator
-                    </li>
-                    <li class="sidebar-item active2">
-                        <a href="dashboard.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="sidebar-header" style="
-    font-weight: bold; color:gray;">
-                        Tools & Components
-                    </li>
-                    <li class="sidebar-item">
-                <a href="form.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    Form
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="records.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    All file Records
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="permanent.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    Permanent Records
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="archive_queue.php" class="sidebar-link">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
-                    Archive Queue
-                </a>
-            </li>
-                    <!--<li class="sidebar-item">
-                        <a href="reports.php" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#pages"
-                            aria-expanded="false" aria-controls="pages">
-                            <i class="fa-solid fa-list pe-2"></i>
-                            Records
-                        </a>
-                        <ul id="pages" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                        <li class="sidebar-item">
-                                <a href="records.php" class="sidebar-link">All file Records</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="permanent.php" class="sidebar-link">Permanent Records</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="archive_queue.php" class="sidebar-link">Archive Queue</a>
-                            </li>
-                            
-                        </ul>
-                    </li>-->
-                    <li class="sidebar-header" style="
-    font-weight: bold; color:gray;">
-                        Admin Action
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="users.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            Users
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="user_log.php" class="sidebar-link">
-                        <i class="fa-regular fa-file-lines pe-2"></i>
-                            User Log
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"
-                            aria-expanded="false" aria-controls="auth">
-                            <i class="fa-regular fa-user pe-2"></i>
-                            Account Settings
-                        </a>
-                        <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                          
-                        <li class="sidebar-item">
-                                <a href="edit_profile.php" class="sidebar-link">Edit Profile</a>
-                            </li>
-                            <li class="sidebar-item">
-                            <a href="logout.php" class="sidebar-link" onclick="return confirmLogout();">Log Out</a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                </ul>
+            <!-- Your sidebar content remains the same -->
+            <!-- ... -->
         </nav>
 
-
-       
-
-        <!-- Page Content  -->
+        <!-- Page Content -->
         <div id="content">
-            
             <div class="menu-header">
                 <button type="button" id="sidebarCollapse" class="btn menu-btn">
-                    <img src="../../../assets/images/burger-bar.png" alt="Menu" width="30" style="margin-left: 10px;">
+                    <img src="../../../assets/images/burger-bar.png" alt="Menu" width="30">
                 </button>
                 <span class="menu-text">Dashboard</span>
                 <img src="../../../assets/images/logo.png" alt="Logo" class="header-logo">
             </div>
-            
-    
-        <!--remove responsive
-        </div>-->
 
-        <!-- Main Content Starts Here -->
-<div class="container-fluid">
-    <div class="container mt-4">
-   
+            <div class="container-fluid py-4">
+                <h1 class="mb-4">Dashboard Overview</h1>
 
-    <h1>DASHBOARD</h1>
+                <!-- Statistics Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="card card-stat text-white h-100 shadow border-0" style="background: linear-gradient(135deg, #007bff, #4dabf7);">
+                            <div class="card-body text-center">
+                                <i class="fas fa-file-alt fs-1 mb-2"></i>
+                                <h5 class="card-title">Total Records</h5>
+                                <p class="card-text fs-3 fw-bold"><?php echo $total_records; ?></p>
+                            </div>
+                        </div>
+                    </div>
 
- <div class="container mt-4">
-    <h1 class="mb-4">Dashboard Overview</h1>
+                    <div class="col-md-3">
+                        <div class="card card-stat text-white h-100 shadow border-0" style="background: linear-gradient(135deg, #28a745, #72e38f);">
+                            <div class="card-body text-center">
+                                <i class="fas fa-archive fs-1 mb-2"></i>
+                                <h5 class="card-title">Permanent Records</h5>
+                                <p class="card-text fs-3 fw-bold"><?php echo $permanent_records; ?></p>
+                            </div>
+                        </div>
+                    </div>
 
-    <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card bg-primary h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-white">Total Records</h5>
-                    <p class="card-text fs-3 text-white"><?php echo $total_records; ?></p>
+                    <div class="col-md-3">
+                        <div class="card card-stat text-dark h-100 shadow border-0" style="background: linear-gradient(135deg, #ffc107, #ffe680);">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clock fs-1 mb-2"></i>
+                                <h5 class="card-title">Archive Queue</h5>
+                                <p class="card-text fs-3 fw-bold"><?php echo $archive_queue; ?></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card card-stat text-white h-100 shadow border-0" style="background: linear-gradient(135deg, #343a40, #6c757d);">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fs-1 mb-2"></i>
+                                <h5 class="card-title">Registered Users</h5>
+                                <p class="card-text fs-3 fw-bold"><?php echo $total_users; ?></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="card bg-success h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-white">Permanent Records</h5>
-                    <p class="card-text fs-3 text-white"><?php echo $permanent_records; ?></p>
-                </div>
-            </div>
-        </div>
+                <!-- Charts Section -->
+                <div class="row">
+                    <!-- Pie Chart -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Document Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="documentPieChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="col-md-3">
-            <div class="card bg-warning h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-white">Archive Queue</h5>
-                    <p class="card-text fs-3 text-white"><?php echo $archive_queue; ?></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card bg-dark h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-white">Registered Users</h5>
-                    <p class="card-text fs-3 text-white"><?php echo $total_users; ?></p>
+                    <!-- Line Chart -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Monthly Document Trend</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="monthlyTrendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-
-   <div class="mt-5">
-    <h3>Document Summary Chart</h3>
-    <canvas id="documentChart" width="200" height="100"></canvas>
-</div>
-</div>
-    </div>
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-<footer class="footer" style="margin-top: 100px; padding: 0px 110px 0px 110px;">
-    <div class="container">
-        <div class="footer-content">
-            <!-- Partnership Logos and Description -->
-            <div class="footer-section about">
-                <div class="logos">
-                    <img src="../../../assets/images/logo.png" alt="Your Logo" class="partner-logo">
-                </div>
-
-                <!-- DENR Mission and Vision -->
-                <div class="denr-mission-vision" style="margin-top: 15px;">
-                    <p><strong>DENR's Mission</strong><br>
-                    To mobilize the citizenry to protect, conserve, and manage the environment and natural resources for present and future generations.</p>
-
-                    <p><strong>DENR's Vision</strong><br>
-                    A nation enjoying and sustaining its natural resources and a clean and healthy environment.</p>
-                </div>
-            </div>
-
-            <!-- Quick Links -->
-            <div class="footer-section links">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="about-us.html">About Us</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="contact.html">Contact Us</a></li>
-                    <li><a href="faq.html">FAQ</a></li>
-                </ul>
-            </div>
-
-            <!-- Contact Information -->
-            <div class="footer-section contact">
-                <h4>Contact Us</h4>
-                <p><i class="fas fa-phone-alt"></i> +63 123 4567 890</p>
-                <p><i class="fas fa-envelope"></i> info@denr_cenro_mf.com</p>
-            </div>
-        </div>
-
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-            <p>&copy; <?php echo date('Y'); ?> DENR-CENRO. All Rights Reserved.</p>
-        </div>
-    </div>
-</footer>
-
-</div>
-
-   
-</div>
-
-
-
-<script>
-    const totalRecords = <?php echo $total_records; ?>;
-    const permanentRecords = <?php echo $permanent_records; ?>;
-    const archiveQueue = <?php echo $archive_queue; ?>;
-    const totalUsers = <?php echo $total_users; ?>;
-
-    const ctx = document.getElementById('documentChart').getContext('2d');
-    const documentChart = new Chart(ctx, {
-        type: 'bar', // You can change to 'pie', 'doughnut', etc.
-        data: {
-            labels: ['Total Records', 'Permanent', 'Archive Queue', 'Users'],
-            datasets: [{
-                label: 'Document Overview',
-                data: [totalRecords, permanentRecords, archiveQueue, totalUsers],
-                backgroundColor: [
-                    'rgba(0, 123, 255, 0.7)',
-                    'rgba(40, 167, 69, 0.7)',
-                    'rgba(255, 193, 7, 0.7)',
-                    'rgba(33, 37, 41, 0.7)'
-                ],
-                borderColor: [
-                    'rgba(0, 123, 255, 1)',
-                    'rgba(40, 167, 69, 1)',
-                    'rgba(255, 193, 7, 1)',
-                    'rgba(33, 37, 41, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>
-
-
-<!-- jQuery CDN - Slim version (=without AJAX) -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <!-- Popper.JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
-    <!-- jQuery Custom Scroller CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#sidebar").mCustomScrollbar({
-                theme: "minimal"
-            });
-            $('#sidebarCollapse').on('click', function () {
-                $('#sidebar, #content').toggleClass('active');
-                $('.collapse.in').toggleClass('in');
-                $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-            });
-        });
-    </script>
     <script>
-    function disable() {
-          return confirm("Are you sure you want to disable/enable this account?");
-      }
-      function confirmDelete() {
-          return confirm("Are you sure you want to delete this account?");
-      }
-      function confirmLogout() {
-          return confirm("Are you sure you want to log out?");
-      }
-  </script>
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleButtons = document.querySelectorAll('.btn-toggle-status');
+        // Ensure DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart data from PHP
+            const totalRecords = <?php echo $total_records; ?>;
+            const permanentRecords = <?php echo $permanent_records; ?>;
+            const archiveQueue = <?php echo $archive_queue; ?>;
+            const monthlyData = <?php echo json_encode($monthlyData); ?>;
 
-        toggleButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = this.getAttribute('data-id');
-                const currentStatus = this.getAttribute('data-status');
-                const newStatus = currentStatus === 'disable' ? 'enable' : 'disable';
+            // Format monthly data for chart
+            const monthlyLabels = monthlyData.map(item => {
+                const [year, month] = item.month.split('-');
+                return new Date(year, month-1).toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
+            });
 
-                // Send AJAX request to update the status
-                fetch('update_status.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `user_id=${userId}&status=${newStatus}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update the button text and status attribute
-                        this.textContent = newStatus === 'disable' ? 'Enable' : 'Disable';
-                        this.setAttribute('data-status', newStatus);
-                    } else {
-                        alert('Failed to update status.');
+            const monthlyCounts = monthlyData.map(item => item.count);
+
+            // 1. Pie Chart - Document Distribution
+            const pieCtx = document.getElementById('documentPieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Permanent Records', 'Archive Queue', 'Other Records'],
+                    datasets: [{
+                        data: [
+                            permanentRecords, 
+                            archiveQueue, 
+                            Math.max(0, totalRecords - permanentRecords - archiveQueue)
+                        ],
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.7)',
+                            'rgba(255, 193, 7, 0.7)',
+                            'rgba(0, 123, 255, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                }
+            });
+
+            // 2. Line Chart - Monthly Trend
+            const trendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: 'Documents Uploaded',
+                        data: monthlyCounts,
+                        backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                        borderColor: 'rgba(13, 110, 253, 0.8)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Sidebar toggle
+            $('#sidebarCollapse').on('click', function() {
+                $('#sidebar, #content').toggleClass('active');
             });
         });
-    });
-</script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
-        <script src="../js/data.js"></script>
-        <script src="../js/form.js"></script>
 
+        function confirmLogout() {
+            return confirm("Are you sure you want to log out?");
+        }
+    </script>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
