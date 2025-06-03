@@ -203,9 +203,19 @@ $result = $conn->query($sql);
     </button>
 </div>
 
-<?php if (isset($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>
+<div>
+        <button id="printBtn" class="btn btn-sm btn-secondary me-2">
+            <i class="bi bi-printer"></i> Print
+        </button>
+        <button id="downloadBtn" class="btn btn-sm btn-success">
+            <i class="bi bi-download"></i> Download CSV
+        </button>
+    </div>
+    <br><br>
+    <?php if (isset($_GET['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Success!</strong> Document was successfully deleted and moved to archive.
+        <strong><i class="bi bi-check-circle-fill"></i> Success!</strong> 
+        <?php echo urldecode($_GET['success']); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <?php endif; ?>
@@ -413,12 +423,13 @@ if ($result && mysqli_num_rows($result) > 0):
  <!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <form action="update_document.php" method="POST">
+    <form action="deletion_function/permanent_update_document.php" method="POST">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="editModalLabel">Edit Document</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
 
         <div class="modal-body row g-3">
           <input type="hidden" name="document_id" id="edit-document-id">
@@ -561,7 +572,14 @@ document.getElementById('searchInput').addEventListener('input', function () {
 </script>
 
 <!--modal for view document-->
+<!-- jQuery Full Version (not slim) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap 5 Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom Scrollbar -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 <script>
 $(document).on('click', '.view-document', function (e) {
     e.preventDefault();
@@ -605,6 +623,232 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script>
+// Store filtered rows globally
+let filteredRows = [];
+
+// Search functionality that stores filtered rows
+function performSearch() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const allRows = document.querySelectorAll('table tbody tr');
+    filteredRows = [];
+
+    allRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchValue)) {
+            row.style.display = '';
+            filteredRows.push(row);
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Print only filtered data
+document.getElementById('printBtn').addEventListener('click', function() {
+    const table = document.querySelector('.table');
+    const win = window.open('', '', 'height=700,width=900');
+    
+    // Use filtered rows if search is active, otherwise all visible rows
+    const rowsToPrint = filteredRows.length > 0 ? 
+        filteredRows : 
+        Array.from(table.querySelectorAll('tbody tr')).filter(row => row.style.display !== 'none');
+    
+    // Define the columns to include
+    const includedColumns = ['Cabinet', 'File Name', 'Document Number', 'Approving Authority', 
+                           'Document Type', 'Filed By', 'Retention Schedule', 'Access Level', 
+                           'Remarks', 'Date Created'];
+    
+    win.document.write('<html><head><title>Document Records</title>');
+    win.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">');
+    win.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">');
+    win.document.write(`
+        <style>
+            body { margin: 20px; font-family: Arial, sans-serif; }
+            .header-container { 
+                position: relative; 
+                margin-bottom: 40px;
+                padding-top: 20px;
+            }
+            .logo-left { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                height: 70px;
+                margin-right: 30px;
+            }
+            .logo-right { 
+                position: absolute; 
+                right: 0; 
+                top: 0; 
+                height: 70px;
+                margin-left: 30px;
+            }
+            .title {
+                margin: 0 auto;
+                width: 60%;
+                text-align: center;
+                padding-top: 15px;
+            }
+            .print-table {
+                width: 100%;
+                border: 2px solid #000;
+                border-collapse: collapse;
+                margin-top: 30px;
+                font-size: 12px;
+            }
+            .print-table th, .print-table td {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: left;
+            }
+            .print-table th {
+                background-color: #212529 !important;
+                color: white !important;
+                text-align: center;
+            }
+            .no-print { display: none; }
+            @page { size: auto; margin: 10mm; }
+        </style>
+    `);
+    win.document.write('</head><body>');
+    
+    // Header with logos
+    win.document.write(`
+        <div class="header-container">
+            <img src="../../../assets/images/bp.png" class="logo-left">
+            <div class="title">
+                <h4 style="margin-bottom: 5px;">Document Management System</h4>
+                <h5>${filteredRows.length > 0 ? 'Filtered Permanent Records' : 'All Permanent Records'}</h5>
+                <p style="font-size: 12px; margin-top: 5px;">Generated on: ${new Date().toLocaleString()}</p>
+                ${filteredRows.length > 0 ? `<p style="font-size: 12px;">Filtered by: "${document.getElementById('searchInput').value}"</p>` : ''}
+            </div>
+            <img src="../../../assets/images/logo.png" class="logo-right">
+        </div>
+    `);
+    
+    // Create a new table with only the specified columns
+    win.document.write('<table class="print-table">');
+    win.document.write('<thead><tr>');
+    
+    // Get headers from the original table
+    const headers = Array.from(table.querySelectorAll('thead th'))
+        .map(th => th.textContent)
+        .filter(header => includedColumns.includes(header));
+    
+    // Write filtered headers
+    headers.forEach(header => {
+        win.document.write(`<th>${header}</th>`);
+    });
+    win.document.write('</tr></thead>');
+    
+    // Write filtered data rows
+    win.document.write('<tbody>');
+    
+    if (rowsToPrint.length === 0) {
+        win.document.write(`<tr><td colspan="${headers.length}" class="text-center">No records found</td></tr>`);
+    } else {
+        rowsToPrint.forEach(row => {
+            const cells = Array.from(row.querySelectorAll('td'));
+            win.document.write('<tr>');
+            
+            // Match cells with included columns
+            Array.from(table.querySelectorAll('thead th')).forEach((th, index) => {
+                if (includedColumns.includes(th.textContent) && cells[index]) {
+                    win.document.write(`<td>${cells[index].textContent}</td>`);
+                }
+            });
+            
+            win.document.write('</tr>');
+        });
+    }
+    
+    win.document.write('</tbody></table>');
+    
+    // Footer
+    win.document.write(`
+        <div style="margin-top: 30px; font-size: 11px; text-align: right;">
+            <p>Total Records: ${rowsToPrint.length}</p>
+            <p>Prepared by: ___________________________</p>
+            <p>Verified by: ___________________________</p>
+        </div>
+    `);
+    
+    win.document.write('</body></html>');
+    win.document.close();
+    setTimeout(() => win.print(), 500);
+});
+
+// Download only filtered data as CSV
+document.getElementById('downloadBtn').addEventListener('click', function() {
+    const table = document.querySelector('.table');
+    
+    // Use filtered rows if search is active, otherwise all visible rows
+    const rowsToExport = filteredRows.length > 0 ? 
+        filteredRows : 
+        Array.from(table.querySelectorAll('tbody tr')).filter(row => row.style.display !== 'none');
+    
+    // Specify which columns to include
+    const includedColumns = ['Cabinet', 'File Name', 'Document Number', 'Approving Authority', 
+                            'Document Type', 'Filed By', 'Retention Schedule', 'Access Level', 
+                            'Remarks', 'Date Created'];
+    
+    // Get headers (only included columns)
+    const headers = [];
+    table.querySelectorAll('thead th').forEach(th => {
+        if (includedColumns.includes(th.textContent)) {
+            headers.push(th.textContent);
+        }
+    });
+    
+    let csv = [headers.join(',')];
+    
+    // Get data rows (only included columns)
+    rowsToExport.forEach(row => {
+        const rowData = [];
+        const cells = row.querySelectorAll('td');
+        
+        Array.from(table.querySelectorAll('thead th')).forEach((th, index) => {
+            if (includedColumns.includes(th.textContent) && cells[index]) {
+                rowData.push('"' + cells[index].textContent.replace(/"/g, '""') + '"');
+            }
+        });
+        
+        if (rowData.length > 0) {
+            csv.push(rowData.join(','));
+        }
+    });
+    
+    // Download CSV file
+    const csvContent = csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    
+    const searchTerm = document.getElementById('searchInput').value;
+    const filename = searchTerm ? 
+        `filtered_documents_${searchTerm.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().slice(0, 10)}.csv` :
+        `permanent_documents_${new Date().toISOString().slice(0, 10)}.csv`;
+    
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', performSearch);
+
+// Search button click handler
+document.getElementById('searchBtn').addEventListener('click', performSearch);
+
+// Initialize with all visible rows
+performSearch();
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
