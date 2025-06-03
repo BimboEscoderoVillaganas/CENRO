@@ -202,6 +202,7 @@ $result = $conn->query($sql);
         <i class="fa fa-search"></i>
     </button>
 </div>
+
 <div>
         <button id="printBtn" class="btn btn-sm btn-secondary me-2">
             <i class="bi bi-printer"></i> Print
