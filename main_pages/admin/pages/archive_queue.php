@@ -602,62 +602,94 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<!-- Add these scripts at the bottom -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script>
-// Print functionality with logos and borders
+// Store filtered rows
+let currentFilteredRows = [];
+
+// Enhanced search function that tracks filtered rows
+function performSearch() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const allRows = document.querySelectorAll('#dataTable tbody tr');
+    currentFilteredRows = [];
+
+    allRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchValue)) {
+            row.style.display = '';
+            currentFilteredRows.push(row);
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Print only visible (filtered) data
 document.getElementById('printBtn').addEventListener('click', function() {
     const table = document.getElementById('dataTable');
-    const win = window.open('', '', 'height=700,width=700');
+    const win = window.open('', '', 'height=700,width=900');
     
-    win.document.write('<html><head><title>Document Records</title>');
+    // Use filtered rows if available, otherwise all visible rows
+    const rowsToPrint = currentFilteredRows.length > 0 ? 
+        currentFilteredRows : 
+        Array.from(table.querySelectorAll('tbody tr')).filter(row => row.style.display !== 'none');
+    
+    // Columns to include (excluding Action and Status)
+    const includedColumns = ['Cabinet', 'File Name', 'Document Number', 'Approving Authority', 
+                           'Document Type', 'Filed By', 'Date Created', 'Retention Schedule', 
+                           'Access Level', 'Remarks'];
+    
+    win.document.write('<html><head><title>Expired Document Records</title>');
     win.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">');
+    win.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">');
     win.document.write(`
         <style>
-            body { margin: 20px; }
+            body { margin: 20px; font-family: Arial, sans-serif; }
             .header-container { 
                 position: relative; 
-                margin-bottom: 30px;
-                padding-top: 10px;
+                margin-bottom: 40px;
+                padding-top: 20px;
             }
             .logo-left { 
                 position: absolute; 
                 left: 0; 
                 top: 0; 
-                height: 80px;
-                margin-right: 20px;
+                height: 70px;
+                margin-right: 30px;
             }
             .logo-right { 
                 position: absolute; 
                 right: 0; 
                 top: 0; 
-                height: 80px;
-                margin-left: 20px;
+                height: 70px;
+                margin-left: 30px;
             }
             .title {
                 margin: 0 auto;
                 width: 60%;
                 text-align: center;
-                padding-top: 10px;
+                padding-top: 15px;
             }
-            table {
+            .print-table {
                 width: 100%;
                 border: 2px solid #000;
                 border-collapse: collapse;
-                margin-top: 20px;
+                margin-top: 30px;
+                font-size: 12px;
             }
-            th, td {
+            .print-table th, .print-table td {
                 border: 1px solid #000;
                 padding: 8px;
                 text-align: left;
             }
-            th {
+            .print-table th {
                 background-color: #212529 !important;
                 color: white !important;
+                text-align: center;
             }
+            .no-print { display: none; }
+            @page { size: auto; margin: 10mm; }
         </style>
     `);
     win.document.write('</head><body>');
@@ -666,103 +698,134 @@ document.getElementById('printBtn').addEventListener('click', function() {
     win.document.write(`
         <div class="header-container">
             <img src="../../../assets/images/bp.png" class="logo-left">
-            <div class="title"><h4>Document Records</h4></div>
-            <img src="../../../assets/images/logo.png" class="logo-right"> <br><br>
+            <div class="title">
+                <h4 style="margin-bottom: 5px;">Document Management System</h4>
+                <h5>${currentFilteredRows.length > 0 ? 'Filtered Expired Records' : 'All Expired Records'}</h5>
+                <p style="font-size: 12px; margin-top: 5px;">Generated on: ${new Date().toLocaleString()}</p>
+                ${document.getElementById('searchInput').value ? 
+                  `<p style="font-size: 12px;">Filtered by: "${document.getElementById('searchInput').value}"</p>` : ''}
+            </div>
+            <img src="../../../assets/images/logo.png" class="logo-right">
         </div>
     `);
     
-    // Create a new table with only the specified columns
-    const allowedColumns = ['Cabinet', 'File Name', 'Document Number', 'Approving Authority', 
-                          'Document Type', 'Filed By', 'Date Created', 'Retention Schedule', 
-                          'Access Level', 'Remarks'];
-    
-    win.document.write('<table>');
+    // Create filtered table
+    win.document.write('<table class="print-table">');
     win.document.write('<thead><tr>');
     
-    // Filter and write headers
-    table.querySelectorAll('th').forEach(th => {
-        if (allowedColumns.includes(th.textContent)) {
-            win.document.write(`<th>${th.textContent}</th>`);
-        }
+    // Get headers from original table
+    const headers = Array.from(table.querySelectorAll('thead th'))
+        .map(th => th.textContent)
+        .filter(header => includedColumns.includes(header));
+    
+    // Write filtered headers
+    headers.forEach(header => {
+        win.document.write(`<th>${header}</th>`);
     });
     win.document.write('</tr></thead>');
     
-    // Filter and write data rows
+    // Write filtered data
     win.document.write('<tbody>');
-    table.querySelectorAll('tbody tr').forEach(row => {
-        win.document.write('<tr>');
-        row.querySelectorAll('td').forEach((td, index) => {
-            const headerText = table.querySelectorAll('th')[index].textContent;
-            if (allowedColumns.includes(headerText)) {
-                win.document.write(`<td>${td.textContent}</td>`);
-            }
+    
+    if (rowsToPrint.length === 0) {
+        win.document.write(`<tr><td colspan="${headers.length}" class="text-center">No matching expired records found</td></tr>`);
+    } else {
+        rowsToPrint.forEach(row => {
+            const cells = Array.from(row.querySelectorAll('td'));
+            win.document.write('<tr>');
+            
+            // Match cells with included columns
+            Array.from(table.querySelectorAll('thead th')).forEach((th, index) => {
+                if (includedColumns.includes(th.textContent) && cells[index]) {
+                    win.document.write(`<td>${cells[index].textContent}</td>`);
+                }
+            });
+            
+            win.document.write('</tr>');
         });
-        win.document.write('</tr>');
-    });
+    }
+    
     win.document.write('</tbody></table>');
+    
+    // Footer
+    win.document.write(`
+        <div style="margin-top: 30px; font-size: 11px; text-align: right;">
+            <p>Total Expired Records: ${rowsToPrint.length}</p>
+            <p>Prepared by: ___________________________</p>
+            <p>Verified by: ___________________________</p>
+        </div>
+    `);
     
     win.document.write('</body></html>');
     win.document.close();
-    win.print();
+    setTimeout(() => win.print(), 500);
 });
 
-// Download CSV functionality with only specified columns
+// Download only visible (filtered) data as CSV
 document.getElementById('downloadBtn').addEventListener('click', function() {
     const table = document.getElementById('dataTable');
-    const rows = table.querySelectorAll('tr');
-    let csv = [];
     
-    // Specify which columns to include
+    // Use filtered rows if available, otherwise all visible rows
+    const rowsToExport = currentFilteredRows.length > 0 ? 
+        currentFilteredRows : 
+        Array.from(table.querySelectorAll('tbody tr')).filter(row => row.style.display !== 'none');
+    
+    // Columns to include
     const includedColumns = ['Cabinet', 'File Name', 'Document Number', 'Approving Authority', 
                             'Document Type', 'Filed By', 'Date Created', 'Retention Schedule', 
                             'Access Level', 'Remarks'];
     
-    // Get headers (only included columns)
+    // Get headers
     const headers = [];
-    table.querySelectorAll('th').forEach(th => {
+    table.querySelectorAll('thead th').forEach(th => {
         if (includedColumns.includes(th.textContent)) {
             headers.push(th.textContent);
         }
     });
-    csv.push(headers.join(','));
     
-    // Get data rows (only included columns)
-    rows.forEach(row => {
+    let csv = [headers.join(',')];
+    
+    // Get data rows
+    rowsToExport.forEach(row => {
         const rowData = [];
-        row.querySelectorAll('td').forEach((td, index) => {
-            const headerText = table.querySelectorAll('th')[index].textContent;
-            if (includedColumns.includes(headerText)) {
-                rowData.push('"' + td.textContent.replace(/"/g, '""') + '"');
+        const cells = row.querySelectorAll('td');
+        
+        Array.from(table.querySelectorAll('thead th')).forEach((th, index) => {
+            if (includedColumns.includes(th.textContent) && cells[index]) {
+                rowData.push('"' + cells[index].textContent.replace(/"/g, '""') + '"');
             }
         });
+        
         if (rowData.length > 0) {
             csv.push(rowData.join(','));
         }
     });
     
-    // Download CSV file
+    // Create and download CSV
     const csvContent = csv.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'document_records_' + new Date().toISOString().slice(0, 10) + '.csv');
+    
+    const searchTerm = document.getElementById('searchInput').value;
+    const filename = searchTerm ? 
+        `expired_documents_filtered_${searchTerm.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().slice(0, 10)}.csv` :
+        `expired_documents_${new Date().toISOString().slice(0, 10)}.csv`;
+    
+    link.setAttribute('download', filename);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 });
 
-// Existing search functionality remains the same
-document.getElementById('searchInput').addEventListener('input', function () {
-    const searchValue = this.value.toLowerCase();
-    const rows = document.querySelectorAll('table tbody tr');
+// Initialize search functionality
+document.getElementById('searchInput').addEventListener('input', performSearch);
+document.getElementById('searchBtn').addEventListener('click', performSearch);
 
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchValue) ? '' : 'none';
-    });
-});
+// Initial search to populate filtered rows
+performSearch();
 </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
