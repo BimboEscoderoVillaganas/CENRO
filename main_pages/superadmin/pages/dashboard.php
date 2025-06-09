@@ -91,7 +91,7 @@ if (mysqli_num_rows($result) > 0) {
                     header('Location: ../../../index.php');
                     exit();
                 }
-                echo '<a href="#">' . htmlspecialchars($_SESSION['username']) . '</a>';
+                echo '<a href="#" style="color:white">' . htmlspecialchars($_SESSION['username']) . '</a>';
             ?>
         </h3>
     </div>
