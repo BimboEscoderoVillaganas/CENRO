@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="alert alert-danger mt-5">
-            <?php echo isset($error) ? $error : "Sorry, your account has been disabled by the head. Please try contacting your head if this is a mistake."; ?>
+            <?php echo isset($error) ? $error : "Sorry, your account has been disabled by the Admin. Please try contacting your Admin if this is a mistake."; ?>
         </div>
         <a href="login.php" class="btn btn-primary">Back to Login</a>
     </div>
