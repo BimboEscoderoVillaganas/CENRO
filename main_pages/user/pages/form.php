@@ -101,31 +101,6 @@ include '../../../src/db/db_connection.php';
             Form
         </a>
     </li>
-    <li class="sidebar-item">
-        <a href="records.php" class="sidebar-link">
-            <i class="fa-solid fa-folder-open pe-2"></i>
-            All File Records
-        </a>
-    </li>
-    <li class="sidebar-item">
-        <a href="permanent.php" class="sidebar-link">
-            <i class="fa-solid fa-box-archive pe-2"></i>
-            Permanent Records
-        </a>
-    </li>
-    <li class="sidebar-item">
-        <a href="archive_queue.php" class="sidebar-link">
-            <i class="fa-solid fa-clock-rotate-left pe-2"></i>
-            Archive Queue
-        </a>
-    </li>
-    
-    <li class="sidebar-item">
-        <a href="archived.php" class="sidebar-link">
-            <i class="fa-solid fa-box-archive pe-2"></i>
-            Archived
-        </a>
-    </li>
 
 
     <li class="sidebar-header" style="font-weight: bold; color: gray;">
