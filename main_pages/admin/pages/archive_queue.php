@@ -110,7 +110,6 @@ if (mysqli_num_rows($result) > 0) {
             <h3 style="color: #ffffff;">
                 <i class="fa-solid fa-user-circle me-2"></i>
             <?php
-                session_start();
                 if (!isset($_SESSION['username'])) {
                     header('Location: ../../../index.php');
                     exit();
