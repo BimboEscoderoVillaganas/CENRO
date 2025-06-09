@@ -132,18 +132,6 @@ include '../../../src/db/db_connection.php';
         Admin Action
     </li>
     <li class="sidebar-item">
-        <a href="users.php" class="sidebar-link">
-            <i class="fa-solid fa-users pe-2"></i>
-            Users
-        </a>
-    </li>
-    <li class="sidebar-item">
-        <a href="user_log.php" class="sidebar-link">
-            <i class="fa-solid fa-file-lines pe-2"></i>
-            User Log
-        </a>
-    </li>
-    <li class="sidebar-item">
         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"
            aria-expanded="false" aria-controls="auth">
             <i class="fa-solid fa-user-gear pe-2"></i>
