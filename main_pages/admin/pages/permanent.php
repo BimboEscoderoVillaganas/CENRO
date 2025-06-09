@@ -23,6 +23,39 @@ $sql = "SELECT d.document_id, f.file_name, d.document_number, d.approving_author
 $result = $conn->query($sql);
 ?>
 
+<?php
+include '../../../src/db/db_connection.php';
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: ../../../index.php');
+    exit();
+}
+
+// Check user type
+$username = $_SESSION['username'];
+$query = "SELECT user_type FROM user_tbl WHERE user_name = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "s", $username);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+if (mysqli_num_rows($result) > 0) {
+    $user = mysqli_fetch_assoc($result);
+    $user_type = $user['user_type'];
+    
+    // Only allow admin and superadmin
+    if (!in_array(strtolower($user_type), ['admin', 'superadmin'])) {
+        header('Location: ../../unauthorized.php'); // Redirect to styled unauthorized page
+        exit();
+    }
+} else {
+    // User not found in database
+    header('Location: ../../../index.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,7 +110,6 @@ $result = $conn->query($sql);
             <h3 style="color: #ffffff;">
                 <i class="fa-solid fa-user-circle me-2"></i>
             <?php
-                session_start();
                 if (!isset($_SESSION['username'])) {
                     header('Location: ../../../index.php');
                     exit();
