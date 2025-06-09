@@ -24,11 +24,10 @@ $total_users = $row['total'];
 $total_pages = ceil($total_users / $results_per_page);
 
 // Query to get the users for the current page, ordered by user_name in ascending order
-$sql = "SELECT user_id, user_name, email, phone_number, user_type, status, district FROM user_tbl WHERE LOWER(user_type) IN ('user', 'admin')";
+$sql = "SELECT user_id, user_name, email, phone_number, user_type, status FROM user_tbl WHERE LOWER(user_type) IN ('user', 'admin')";
 if (!empty($search_term)) {
     $sql .= " AND (user_name LIKE '%" . $conn->real_escape_string($search_term) . "%' 
-                 OR status LIKE '%" . $conn->real_escape_string($search_term) . "%' 
-                 OR district LIKE '%" . $conn->real_escape_string($search_term) . "%')";
+                 OR status LIKE '%" . $conn->real_escape_string($search_term) . "%')";
 }
 $sql .= " ORDER BY user_name ASC LIMIT $start_from, $results_per_page";
 $result = $conn->query($sql);
@@ -235,7 +234,6 @@ $result = $conn->query($sql);
     <table class="table table-striped table-bordered">
         <thead>
             <tr>
-                <th>District</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone Number</th> <!-- Added Phone Number column -->
@@ -249,7 +247,6 @@ $result = $conn->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>
-                            <td>{$row['district']}</td>
                             <td>{$row['user_name']}</td>
                             <td>{$row['email']}</td>
                             <td>{$row['phone_number']}</td> <!-- Display Phone Number -->

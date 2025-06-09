@@ -218,10 +218,11 @@ include '../../../src/db/db_connection.php';
 
 <form class="form-group" method="POST" action="process_document.php" enctype="multipart/form-data">
     <div class="row mb-3">
-        <div class="col-md-6">
-            <label for="documentTitle" class="form-label">Document Title</label>
+        <div class="col-md-6 mb-3">
+            <label for="documentTitle" class="form-label">Document Title / Owner's Name</label>
             <input type="text" class="form-control" id="documentTitle" name="documentTitle" required>
         </div>
+
         <div class="col-md-6">
             <label for="documentNumber" class="form-label">Document Number</label>
             <input type="text" class="form-control" id="documentNumber" name="documentNumber" required>
@@ -250,9 +251,9 @@ include '../../../src/db/db_connection.php';
             <input type="text" class="form-control" id="filedBy" name="filedBy" value="<?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : ''; ?>" readonly required>
         </div>
         <div class="col-md-6">
-            <label for="location" class="form-label">Location</label>
+            <label for="location" class="form-label">Cabinet Location</label>
             <select class="form-select" id="location" name="location" required>
-                <option value="">Select Location</option>
+                <option value="">Select Cabinet Location</option>
                 <?php
                 try {
                     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
