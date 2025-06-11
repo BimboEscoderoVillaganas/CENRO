@@ -202,59 +202,81 @@ if (mysqli_num_rows($result) > 0) {
     <div class="container mt-4">
    
 <div class="row">
-                            <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content bg-midnight-bloom">
-                                    <div class="widget-content-wrapper text-white">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading">Total Orders</div>
-                                            <div class="widget-subheading">Last year expenses</div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>1896</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content bg-arielle-smile">
-                                    <div class="widget-content-wrapper text-white">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading">Clients</div>
-                                            <div class="widget-subheading">Total Clients Profit</div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>$ 568</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content bg-grow-early">
-                                    <div class="widget-content-wrapper text-white">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading">Followers</div>
-                                            <div class="widget-subheading">People Interested</div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-white"><span>46%</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-xl-none d-lg-block col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content bg-premium-dark">
-                                    <div class="widget-content-wrapper text-white">
-                                        <div class="widget-content-left">
-                                            <div class="widget-heading">Products Sold</div>
-                                            <div class="widget-subheading">Revenue streams</div>
-                                        </div>
-                                        <div class="widget-content-right">
-                                            <div class="widget-numbers text-warning"><span>$14M</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+ <?php
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query for total documents
+$total_query = "SELECT COUNT(*) AS total FROM document_tbl WHERE deleted = 'no'";
+$total_result = $conn->query($total_query);
+$total_row = $total_result->fetch_assoc();
+$total_documents = $total_row['total'];
+
+// Query for permanent documents
+$perm_query = "SELECT COUNT(*) AS permanent FROM document_tbl WHERE retention_schedule = 'PERMANENT' AND deleted = 'no'";
+$perm_result = $conn->query($perm_query);
+$perm_row = $perm_result->fetch_assoc();
+$permanent_documents = $perm_row['permanent'];
+
+// Query for archive queue
+$archive_query = "SELECT COUNT(*) AS archive FROM document_tbl 
+                 WHERE retention_schedule != 'PERMANENT' 
+                 AND STR_TO_DATE(retention_schedule, '%Y-%m-%d') < CURDATE() 
+                 AND deleted = 'no'";
+$archive_result = $conn->query($archive_query);
+$archive_row = $archive_result->fetch_assoc();
+$archive_queue = $archive_row['archive'];
+
+?>
+
+
+            <div class="col-md-6 col-xl-4">
+                <div class="card mb-3 widget-content bg-midnight-bloom" onclick="window.location.href='records.php'" style="cursor: pointer;">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Total Number of Documents</div>
+                            <div class="widget-subheading">All Documents</div>
                         </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white"><span><?php echo $total_documents; ?></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="card mb-3 widget-content bg-arielle-smile" onclick="window.location.href='permanent.php'" style="cursor: pointer;">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Permanent Documents</div>
+                            <div class="widget-subheading">Number of Permanent Documents</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white"><span><?php echo $permanent_documents; ?></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="card mb-3 widget-content bg-grow-early" onclick="window.location.href='archive_queue.php'" style="cursor: pointer;">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Queue to Archive</div>
+                            <div class="widget-subheading">Number of documents to be archive</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white"><span><?php echo $archive_queue; ?></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                            
+                        </div>
+
+
+
                         <div class="row">
                             <div class="col-md-12 col-lg-6">
                                 <div class="mb-3 card">
@@ -400,6 +422,11 @@ if (mysqli_num_rows($result) > 0) {
                                     </div>
                                 </div>
                             </div>
+
+
+
+
+
                             <div class="col-md-12 col-lg-6">
                                 <div class="mb-3 card">
                                     <div class="card-header-tab card-header">
@@ -513,17 +540,74 @@ if (mysqli_num_rows($result) > 0) {
                                 </div>
                             </div>
                         </div>
+
+
+
+
+
+                        <?php
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query to get total number of users
+$totalUsersQuery = "SELECT COUNT(*) as total FROM user_tbl";
+$totalUsersResult = $conn->query($totalUsersQuery);
+$totalUsers = $totalUsersResult->fetch_assoc()['total'];
+
+// Query to get enabled/active accounts (exclude status = 'disable')
+$activeUsersQuery = "SELECT COUNT(DISTINCT u.user_id) as active 
+                     FROM user_tbl u 
+                     LEFT JOIN user_log l ON u.user_id = l.user_id 
+                     WHERE u.status != 'disable' 
+                     AND (
+                         u.status = 'enable' 
+                         OR (l.login_date > DATE_SUB(NOW(), INTERVAL 30 DAY))
+                     )";
+$activeUsersResult = $conn->query($activeUsersQuery);
+$activeUsers = $activeUsersResult->fetch_assoc()['active'];
+
+// Query to get inactive accounts (no recent activity)
+$inactiveUsersQuery = "SELECT COUNT(DISTINCT u.user_id) as inactive 
+                       FROM user_tbl u 
+                       LEFT JOIN user_log l ON u.user_id = l.user_id 
+                       WHERE (u.status IS NULL OR u.status != 'enable') 
+                       AND (l.login_date IS NULL OR l.login_date < DATE_SUB(NOW(), INTERVAL 30 DAY))
+                       AND u.status != 'disable'";
+$inactiveUsersResult = $conn->query($inactiveUsersQuery);
+$inactiveUsers = $inactiveUsersResult->fetch_assoc()['inactive'];
+
+// Query to get disabled accounts
+$disabledUsersQuery = "SELECT COUNT(*) as disabled FROM user_tbl WHERE status = 'disable'";
+$disabledUsersResult = $conn->query($disabledUsersQuery);
+$disabledUsers = $disabledUsersResult->fetch_assoc()['disabled'];
+?>
                         <div class="row">
                             <div class="col-md-6 col-xl-4">
                                 <div class="card mb-3 widget-content">
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Total Orders</div>
-                                                <div class="widget-subheading">Last year expenses</div>
+                                            <div class="widget-content-left"><div class="widget-heading">Number of users</div>
+                                            <div class="widget-subheading">Total registered accounts</div>
+
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-success">1896</div>
+                                                <div class="widget-numbers text-success"><?php echo $totalUsers; ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card mb-3 widget-content">
+                                    <div class="widget-content-outer">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left"><div class="widget-heading">Inactive Accounts</div>
+                                            <div class="widget-subheading">Inactive for 30+ days</div>
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-warning"><?php echo $inactiveUsers; ?></div>
                                             </div>
                                         </div>
                                     </div>
@@ -534,274 +618,168 @@ if (mysqli_num_rows($result) > 0) {
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left">
-                                                <div class="widget-heading">Products Sold</div>
-                                                <div class="widget-subheading">Revenue streams</div>
+                                                <div class="widget-heading">Number of disabled accounts</div>
+                                                <div class="widget-subheading">Accounts currently deactivated or suspended</div>
                                             </div>
                                             <div class="widget-content-right">
-                                                <div class="widget-numbers text-warning">$3M</div>
+                                                <div class="widget-numbers text-danger"><?php echo $disabledUsers; ?></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content">
-                                    <div class="widget-content-outer">
-                                        <div class="widget-content-wrapper">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Followers</div>
-                                                <div class="widget-subheading">People Interested</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-danger">45,9%</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-xl-none d-lg-block col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content">
-                                    <div class="widget-content-outer">
-                                        <div class="widget-content-wrapper">
-                                            <div class="widget-content-left">
-                                                <div class="widget-heading">Income</div>
-                                                <div class="widget-subheading">Expected totals</div>
-                                            </div>
-                                            <div class="widget-content-right">
-                                                <div class="widget-numbers text-focus">$147</div>
-                                            </div>
-                                        </div>
-                                        <div class="widget-progress-wrapper">
-                                            <div class="progress-bar-sm progress-bar-animated-alt progress">
-                                                <div class="progress-bar bg-info" role="progressbar" aria-valuenow="54" aria-valuemin="0" aria-valuemax="100" style="width: 54%;"></div>
-                                            </div>
-                                            <div class="progress-sub-label">
-                                                <div class="sub-label-left">Expenses</div>
-                                                <div class="sub-label-right">100%</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </div>\
                         </div>
+
+
+                        
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="main-card mb-3 card">
-                                    <div class="card-header">Active Users
-                                        <div class="btn-actions-pane-right">
-                                            <div role="group" class="btn-group-sm btn-group">
-                                                <button class="active btn btn-focus">Last Week</button>
-                                                <button class="btn btn-focus">All Month</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="align-middle mb-0 table table-borderless table-striped table-hover">
-                                            <thead>
-                                            <tr>
-                                                <th class="text-center">#</th>
-                                                <th>Name</th>
-                                                <th class="text-center">City</th>
-                                                <th class="text-center">Status</th>
-                                                <th class="text-center">Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td class="text-center text-muted">#345</td>
-                                                <td>
-                                                    <div class="widget-content p-0">
-                                                        <div class="widget-content-wrapper">
-                                                            <div class="widget-content-left mr-3">
-                                                                <div class="widget-content-left">
-                                                                    <img width="40" class="rounded-circle" src="assets/images/avatars/4.jpg" alt="">
-                                                                </div>
-                                                            </div>
-                                                            <div class="widget-content-left flex2">
-                                                                <div class="widget-heading">John Doe</div>
-                                                                <div class="widget-subheading opacity-7">Web Developer</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center">Madrid</td>
-                                                <td class="text-center">
-                                                    <div class="badge badge-warning">Pending</div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <button type="button" id="PopoverCustomT-1" class="btn btn-primary btn-sm">Details</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-center text-muted">#347</td>
-                                                <td>
-                                                    <div class="widget-content p-0">
-                                                        <div class="widget-content-wrapper">
-                                                            <div class="widget-content-left mr-3">
-                                                                <div class="widget-content-left">
-                                                                    <img width="40" class="rounded-circle" src="assets/images/avatars/3.jpg" alt="">
-                                                                </div>
-                                                            </div>
-                                                            <div class="widget-content-left flex2">
-                                                                <div class="widget-heading">Ruben Tillman</div>
-                                                                <div class="widget-subheading opacity-7">Etiam sit amet orci eget</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center">Berlin</td>
-                                                <td class="text-center">
-                                                    <div class="badge badge-success">Completed</div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <button type="button" id="PopoverCustomT-2" class="btn btn-primary btn-sm">Details</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-center text-muted">#321</td>
-                                                <td>
-                                                    <div class="widget-content p-0">
-                                                        <div class="widget-content-wrapper">
-                                                            <div class="widget-content-left mr-3">
-                                                                <div class="widget-content-left">
-                                                                    <img width="40" class="rounded-circle" src="assets/images/avatars/2.jpg" alt="">
-                                                                </div>
-                                                            </div>
-                                                            <div class="widget-content-left flex2">
-                                                                <div class="widget-heading">Elliot Huber</div>
-                                                                <div class="widget-subheading opacity-7">Lorem ipsum dolor sic</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center">London</td>
-                                                <td class="text-center">
-                                                    <div class="badge badge-danger">In Progress</div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <button type="button" id="PopoverCustomT-3" class="btn btn-primary btn-sm">Details</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-center text-muted">#55</td>
-                                                <td>
-                                                    <div class="widget-content p-0">
-                                                        <div class="widget-content-wrapper">
-                                                            <div class="widget-content-left mr-3">
-                                                                <div class="widget-content-left">
-                                                                    <img width="40" class="rounded-circle" src="assets/images/avatars/1.jpg" alt=""></div>
-                                                            </div>
-                                                            <div class="widget-content-left flex2">
-                                                                <div class="widget-heading">Vinnie Wagstaff</div>
-                                                                <div class="widget-subheading opacity-7">UI Designer</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center">Amsterdam</td>
-                                                <td class="text-center">
-                                                    <div class="badge badge-info">On Hold</div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <button type="button" id="PopoverCustomT-4" class="btn btn-primary btn-sm">Details</button>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="d-block text-center card-footer">
-                                        <button class="mr-2 btn-icon btn-icon-only btn btn-outline-danger"><i class="pe-7s-trash btn-icon-wrapper"> </i></button>
-                                        <button class="btn-wide btn btn-success">Save</button>
-                                    </div>
-                                </div>
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-header">User Activity Log
+                <div class="btn-actions-pane-right">
+                    <div class="d-flex align-items-center">
+                        <div role="group" class="btn-group-sm btn-group mr-3">
+                            <button class="btn btn-focus filter-btn" data-filter="this-week">This Week</button>
+                            <button class="btn btn-focus filter-btn" data-filter="last-week">Last Week</button>
+                            <button class="btn btn-focus filter-btn active" data-filter="all-month">All Month</button>
+                        </div>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search users..." onkeyup="dynamicSearch()">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" type="button" id="searchButton">Search</button>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card-shadow-danger mb-3 widget-chart widget-chart2 text-left card">
-                                    <div class="widget-content">
-                                        <div class="widget-content-outer">
-                                            <div class="widget-content-wrapper">
-                                                <div class="widget-content-left pr-2 fsize-1">
-                                                    <div class="widget-numbers mt-0 fsize-3 text-danger">71%</div>
-                                                </div>
-                                                <div class="widget-content-right w-100">
-                                                    <div class="progress-bar-xs progress">
-                                                        <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="71" aria-valuemin="0" aria-valuemax="100" style="width: 71%;"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="widget-content-left fsize-1">
-                                                <div class="text-muted opacity-6">Income Target</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card-shadow-success mb-3 widget-chart widget-chart2 text-left card">
-                                    <div class="widget-content">
-                                        <div class="widget-content-outer">
-                                            <div class="widget-content-wrapper">
-                                                <div class="widget-content-left pr-2 fsize-1">
-                                                    <div class="widget-numbers mt-0 fsize-3 text-success">54%</div>
-                                                </div>
-                                                <div class="widget-content-right w-100">
-                                                    <div class="progress-bar-xs progress">
-                                                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="54" aria-valuemin="0" aria-valuemax="100" style="width: 54%;"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="widget-content-left fsize-1">
-                                                <div class="text-muted opacity-6">Expenses Target</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card-shadow-warning mb-3 widget-chart widget-chart2 text-left card">
-                                    <div class="widget-content">
-                                        <div class="widget-content-outer">
-                                            <div class="widget-content-wrapper">
-                                                <div class="widget-content-left pr-2 fsize-1">
-                                                    <div class="widget-numbers mt-0 fsize-3 text-warning">32%</div>
-                                                </div>
-                                                <div class="widget-content-right w-100">
-                                                    <div class="progress-bar-xs progress">
-                                                        <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="32" aria-valuemin="0" aria-valuemax="100" style="width: 32%;"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="widget-content-left fsize-1">
-                                                <div class="text-muted opacity-6">Spendings Target</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-3">
-                                <div class="card-shadow-info mb-3 widget-chart widget-chart2 text-left card">
-                                    <div class="widget-content">
-                                        <div class="widget-content-outer">
-                                            <div class="widget-content-wrapper">
-                                                <div class="widget-content-left pr-2 fsize-1">
-                                                    <div class="widget-numbers mt-0 fsize-3 text-info">89%</div>
-                                                </div>
-                                                <div class="widget-content-right w-100">
-                                                    <div class="progress-bar-xs progress">
-                                                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100" style="width: 89%;"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="widget-content-left fsize-1">
-                                                <div class="text-muted opacity-6">Totals Target</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table class="align-middle mb-0 table table-borderless table-striped table-hover" id="userLogTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center position-sticky top-0 bg-white">#</th>
+                            <th class="position-sticky top-0 bg-white">User Name</th>
+                            <th class="text-center position-sticky top-0 bg-white">Email</th>
+                            <th class="text-center position-sticky top-0 bg-white">Phone</th>
+                            <th class="text-center position-sticky top-0 bg-white">User Type</th>
+                            <th class="text-center position-sticky top-0 bg-white">Status</th>
+                            <th class="text-center position-sticky top-0 bg-white">Login Date</th>
+                            <th class="text-center position-sticky top-0 bg-white">Logout Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userLogBody">
+                        <?php
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Default query for all month
+$query = "SELECT ul.log_id, ul.user_name, u.email, u.phone_number, u.user_type, u.status, 
+         ul.login_date, ul.logout_date 
+         FROM user_log ul
+         JOIN user_tbl u ON ul.user_id = u.user_id
+         WHERE MONTH(ul.login_date) = MONTH(CURRENT_DATE())
+         ORDER BY ul.login_date DESC";
+
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    $count = 1;
+    while($row = $result->fetch_assoc()) {
+        // Set default status to "Enable" if empty or null
+        $status = (!empty($row['status']) && $row['status'] != 'no data') ? $row['status'] : 'enable';
+        $badgeClass = ($status == 'enable') ? 'success' : 'warning';
+        
+        echo "<tr>";
+        echo "<td class='text-center text-muted'>".$count."</td>";
+        echo "<td>".htmlspecialchars($row['user_name'] ?? 'N/A')."</td>";
+        echo "<td class='text-center'>".htmlspecialchars($row['email'] ?? 'N/A')."</td>";
+        echo "<td class='text-center'>".htmlspecialchars($row['phone_number'] ?? 'N/A')."</td>";
+        echo "<td class='text-center'>".htmlspecialchars(ucfirst($row['user_type'] ?? 'N/A'))."</td>";
+        echo "<td class='text-center'><div class='badge badge-".$badgeClass."'>".htmlspecialchars(ucfirst($status))."</div></td>";
+        echo "<td class='text-center'>".($row['login_date'] ? date('M d, Y h:i A', strtotime($row['login_date'])) : 'N/A')."</td>";
+        echo "<td class='text-center'>".($row['logout_date'] ? date('M d, Y h:i A', strtotime($row['logout_date'])) : 'Still active')."</td>";
+        echo "</tr>";
+        $count++;
+    }
+} else {
+    echo "<tr><td colspan='9' class='text-center'>No user activity found</td></tr>";
+}
+?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-block text-center card-footer">
+                <button class="btn-wide btn btn-success" onclick="exportToExcel()">Export to Excel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Debounce function to limit how often search executes
+let searchTimer;
+function dynamicSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        fetchUserLogs(activeFilter, searchTerm);
+    }, 300); // 300ms delay after typing stops
+}
+
+// Filter buttons functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filter = this.getAttribute('data-filter');
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        fetchUserLogs(filter, searchTerm);
+    });
+});
+
+// Search button functionality
+document.getElementById('searchButton').addEventListener('click', function() {
+    const searchTerm = document.getElementById('searchInput').value.trim();
+    const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+    fetchUserLogs(activeFilter, searchTerm);
+});
+
+// Function to fetch user logs with filters
+function fetchUserLogs(timeFilter, searchTerm = '') {
+    fetch('fetch_user_logs.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `timeFilter=${timeFilter}&searchTerm=${encodeURIComponent(searchTerm)}`
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('userLogBody').innerHTML = data;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Export to Excel function
+function exportToExcel() {
+    const table = document.getElementById('userLogTable');
+    const html = table.outerHTML;
+    const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'user_activity_log.xls';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+</script>
+                        
+
+
+
 
 
 
