@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 20, 2025 at 09:13 AM
+-- Generation Time: Jun 13, 2025 at 02:35 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,25 +38,8 @@ CREATE TABLE `cabinet_tbl` (
 --
 
 INSERT INTO `cabinet_tbl` (`cabinet_number`, `cabinet_code`, `cabinet_location`) VALUES
-(1, '001', 'A'),
-(2, '002', 'A'),
-(3, '001', 'B'),
-(4, '002', 'B'),
-(5, '003', 'A'),
-(6, '003', 'B'),
-(7, '001', 'C'),
-(8, '002', 'C'),
-(9, '003', 'C'),
-(10, '001', 'D'),
-(11, '001', 'D'),
-(12, '002', 'D'),
-(13, 'dtf', 'A'),
-(14, 'dtf', 'jyf'),
-(15, 'dtf', '12'),
-(16, '001', 'jyf'),
-(17, '001', 'jyf'),
-(18, '001', 'E'),
-(19, '001', 'z');
+(20, '001', 'A'),
+(21, '002', 'A');
 
 -- --------------------------------------------------------
 
@@ -76,8 +59,42 @@ CREATE TABLE `document_tbl` (
   `retention_schedule` varchar(100) DEFAULT NULL,
   `access_level` varchar(50) DEFAULT NULL,
   `remarks` text DEFAULT NULL,
-  `status` varchar(50) DEFAULT NULL
+  `status` varchar(50) DEFAULT NULL,
+  `deleted` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `document_tbl`
+--
+
+INSERT INTO `document_tbl` (`document_id`, `document_number`, `description`, `approving_authority`, `document_type`, `date_created`, `filed_by`, `location`, `retention_schedule`, `access_level`, `remarks`, `status`, `deleted`) VALUES
+(10, 0, 'sample 5', 'sample 5', 'CERTIFICATIONS', '2025-05-29', 'sample 4', '21', '0001-01-01', 'Public', 'sample 5', 'Active', 'no'),
+(11, 0, 'sample 6', 'sample 6', 'CERTIFICATIONS', '2010-06-30', 'sample 6', '21', '2011-06-30', 'Public', 'sample 6', 'Active', 'no'),
+(12, 0, 'Filed By', 'sample 7', 'CHARTS', '2009-06-30', 'sample 7', '20', 'PERMANENT', 'Confidential', 'Filed By', 'Active', 'no'),
+(13, 1233494, 'sample 10', 'sample 10', 'CHARTS', '2025-05-06', 'admin Bimbo', '20', 'PERMANENT', 'Public', 'sample 10', NULL, 'no'),
+(14, 1, 'for testing', 'for testing', 'CERTIFICATIONS', '2025-06-02', 'admin Bimbo', '21', '2026-06-02', 'Public', 'for testing', 'Active', 'no'),
+(15, 123, 'rfteg', 'fs', 'CERTIFICATIONS', '2025-06-09', 'samp', '21', '2026-06-09', 'Public', 'rtg', 'Active', 'no');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `document_type`
+--
+
+CREATE TABLE `document_type` (
+  `document_type_id` int(11) NOT NULL,
+  `document_type` varchar(100) NOT NULL,
+  `shelf_life` varchar(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `document_type`
+--
+
+INSERT INTO `document_type` (`document_type_id`, `document_type`, `shelf_life`) VALUES
+(4, 'CERTIFICATIONS', '1'),
+(6, 'CHARTS', 'PERMANENT'),
+(7, 'DELIVERY RECEIPTS', '2');
 
 -- --------------------------------------------------------
 
@@ -212,7 +229,34 @@ INSERT INTO `user_log` (`log_id`, `user_id`, `user_name`, `login_date`, `logout_
 (369, 2, 'admin Bimbo', '2025-05-16 09:15:24', '2025-05-16 15:24:11'),
 (370, 2, 'admin Bimbo', '2025-05-19 07:03:56', NULL),
 (371, 2, 'admin Bimbo', '2025-05-20 02:38:04', NULL),
-(372, 2, 'admin Bimbo', '2025-05-20 03:41:27', NULL);
+(372, 2, 'admin Bimbo', '2025-05-20 03:41:27', NULL),
+(373, 2, 'admin Bimbo', '2025-05-29 02:28:53', NULL),
+(374, 2, 'admin Bimbo', '2025-05-30 02:11:01', NULL),
+(375, 2, 'admin Bimbo', '2025-06-02 07:24:46', '2025-06-02 15:38:44'),
+(376, 2, 'admin Bimbo', '2025-06-02 09:38:50', '2025-06-02 15:39:05'),
+(377, 2, 'admin Bimbo', '2025-06-02 09:39:33', NULL),
+(378, 2, 'admin Bimbo', '2025-06-03 02:25:34', NULL),
+(379, 2, 'admin Bimbo', '2025-06-04 02:12:23', '2025-06-09 09:22:59'),
+(380, 2, 'admin Bimbo', '2025-06-09 03:23:39', '2025-06-09 09:23:47'),
+(381, 2, 'admin Bimbo', '2025-06-09 03:23:53', '2025-06-09 09:26:36'),
+(382, 2, 'admin Bimbo', '2025-06-09 03:26:43', '2025-06-09 09:37:04'),
+(383, 88, 'sample', '2025-06-09 03:37:09', '2025-06-09 09:56:59'),
+(384, 89, 'samp', '2025-06-09 03:57:04', '2025-06-09 10:08:18'),
+(385, 88, 'sample', '2025-06-09 04:08:23', NULL),
+(386, 88, 'sample', '2025-06-09 04:09:11', NULL),
+(387, 88, 'sample', '2025-06-09 04:24:17', '2025-06-09 13:39:15'),
+(388, 89, 'samp', '2025-06-09 04:24:54', NULL),
+(389, 89, 'samp', '2025-06-09 07:02:43', NULL),
+(390, 2, 'admin Bimbo', '2025-06-09 07:39:22', NULL),
+(391, 89, 'samp', '2025-06-09 07:43:23', NULL),
+(392, 2, 'admin Bimbo', '2025-06-10 02:07:19', NULL),
+(393, 2, 'admin Bimbo', '2025-06-10 07:22:18', NULL),
+(394, 2, 'admin Bimbo', '2025-06-11 02:13:01', NULL),
+(395, 2, 'admin Bimbo', '2025-06-11 08:05:17', NULL),
+(396, 2, 'admin Bimbo', '2025-06-13 02:18:47', NULL),
+(397, 2, 'admin Bimbo', '2025-06-13 02:25:38', '2025-06-13 08:25:56'),
+(398, 89, 'samp', '2025-06-13 02:26:03', '2025-06-13 08:26:16'),
+(399, 88, 'sample', '2025-06-13 02:26:24', NULL);
 
 -- --------------------------------------------------------
 
@@ -222,12 +266,10 @@ INSERT INTO `user_log` (`log_id`, `user_id`, `user_name`, `login_date`, `logout_
 
 CREATE TABLE `user_tbl` (
   `user_id` int(11) NOT NULL,
-  `id_number` int(12) NOT NULL,
   `user_name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `phone_number` varchar(11) NOT NULL,
   `pass` varchar(255) NOT NULL,
-  `district` varchar(50) NOT NULL,
   `user_type` varchar(50) NOT NULL,
   `status` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -236,12 +278,13 @@ CREATE TABLE `user_tbl` (
 -- Dumping data for table `user_tbl`
 --
 
-INSERT INTO `user_tbl` (`user_id`, `id_number`, `user_name`, `email`, `phone_number`, `pass`, `district`, `user_type`, `status`) VALUES
-(2, 20201259, 'admin Bimbo', 'admin@gmail.com', '0556282485', '$2y$10$TWyAZbbDQcms2lAoXPvqzOsotVJHvS/Cc9Ef5gi1MxrnXIhMqEHQm', '1', 'supervisor', ''),
-(51, 20201259, 'user', 'user@gmail.com', '09123456789', '$2y$10$t5s1OamaFxb/lfKweuNyQeNYAUo/GOXgxDapPsMdj2LNqFv3ZMa22', 'District 4', 'Implementer', 'enable'),
-(53, 20201259, 'admin Bimbo', 'bimbo@gmail.com', '09999999999', '$2y$10$zF0Odp6OP26PXE.jzDHqdOJ625TNUjWS72yk8gXrlvaqvxFPgTK7W', 'District 1', 'Supervisor', ''),
-(74, 20201259, 'ako', 'bimbo@gmail.com', '09999999999', '$2y$10$kqy6y5pXXkPVkrcd6GKaOu6R9oUE2duy1xQNPCvLsYmgUWoaEmGLm', 'District 4', 'Volunteer', ''),
-(75, 20201259, 'ako', 'villaganasbimbo123@gmail.com', '09123456789', '$2y$10$pknYoNr90SkUH0roWZ7VJ.sGDVdNbvU1WuEe9v3AguRIEztyEbg4C', 'District 1', 'Volunteer', '');
+INSERT INTO `user_tbl` (`user_id`, `user_name`, `email`, `phone_number`, `pass`, `user_type`, `status`) VALUES
+(2, 'admin Bimbo', 'admin@gmail.com', '0556282485', '$2y$10$TWyAZbbDQcms2lAoXPvqzOsotVJHvS/Cc9Ef5gi1MxrnXIhMqEHQm', 'superadmin', ''),
+(51, 'user', 'user@gmail.com', '09123456789', '$2y$10$t5s1OamaFxb/lfKweuNyQeNYAUo/GOXgxDapPsMdj2LNqFv3ZMa22', 'admin', 'enable'),
+(53, 'admin Bimbo', 'bimbo@gmail.com', '09999999999', '$2y$10$zF0Odp6OP26PXE.jzDHqdOJ625TNUjWS72yk8gXrlvaqvxFPgTK7W', 'superadmin', ''),
+(74, 'ako', 'bimbo@gmail.com', '09999999999', '$2y$10$kqy6y5pXXkPVkrcd6GKaOu6R9oUE2duy1xQNPCvLsYmgUWoaEmGLm', 'user', ''),
+(88, 'sample', 'sample@gmail.com', '09000000001', '$2y$10$FzOnKtwZU5yl9fdef8Lbju/lYP31iK5E/kuGgYApxBFI8Lwr/TsYO', 'admin', ''),
+(89, 'samp', 'samp@gmail.com', '09000000000', '$2y$10$pytvmH0UGNG/MMvvm9HNOufz4F7fzkP48iWsT9DUOMaB3e62kHkHy', 'user', 'enable');
 
 --
 -- Indexes for dumped tables
@@ -259,6 +302,12 @@ ALTER TABLE `cabinet_tbl`
 ALTER TABLE `document_tbl`
   ADD PRIMARY KEY (`document_id`),
   ADD KEY `document_number` (`document_number`);
+
+--
+-- Indexes for table `document_type`
+--
+ALTER TABLE `document_type`
+  ADD PRIMARY KEY (`document_type_id`);
 
 --
 -- Indexes for table `file_tbl`
@@ -289,41 +338,41 @@ ALTER TABLE `user_tbl`
 -- AUTO_INCREMENT for table `cabinet_tbl`
 --
 ALTER TABLE `cabinet_tbl`
-  MODIFY `cabinet_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `cabinet_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `document_tbl`
 --
 ALTER TABLE `document_tbl`
-  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `document_type`
+--
+ALTER TABLE `document_type`
+  MODIFY `document_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `file_tbl`
 --
 ALTER TABLE `file_tbl`
-  MODIFY `file_number` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `file_number` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `user_log`
 --
 ALTER TABLE `user_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=373;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=400;
 
 --
 -- AUTO_INCREMENT for table `user_tbl`
 --
 ALTER TABLE `user_tbl`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `document_tbl`
---
-ALTER TABLE `document_tbl`
-  ADD CONSTRAINT `document_tbl_ibfk_1` FOREIGN KEY (`document_number`) REFERENCES `cabinet_tbl` (`cabinet_number`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `file_tbl`

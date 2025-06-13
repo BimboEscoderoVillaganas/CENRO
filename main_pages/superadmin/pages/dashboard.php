@@ -666,7 +666,7 @@ $disabledUsers = $disabledUsersResult->fetch_assoc()['disabled'];
                             <th class="text-center position-sticky top-0 bg-white">Logout Date</th>
                         </tr>
                     </thead>
-                    <tbody id="userLogBody">
+                    <tbody>
                         <?php
 // Check connection
 if ($conn->connect_error) {
@@ -747,21 +747,7 @@ document.getElementById('searchButton').addEventListener('click', function() {
     fetchUserLogs(activeFilter, searchTerm);
 });
 
-// Function to fetch user logs with filters
-function fetchUserLogs(timeFilter, searchTerm = '') {
-    fetch('fetch_user_logs.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `timeFilter=${timeFilter}&searchTerm=${encodeURIComponent(searchTerm)}`
-    })
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('userLogBody').innerHTML = data;
-    })
-    .catch(error => console.error('Error:', error));
-}
+
 
 // Export to Excel function
 function exportToExcel() {
