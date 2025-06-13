@@ -2,6 +2,39 @@
 include '../../../src/db/db_connection.php';
 ?>
 
+<?php
+include '../../../src/db/db_connection.php';
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: ../../../index.php');
+    exit();
+}
+
+// Check user type
+$username = $_SESSION['username'];
+$query = "SELECT user_type FROM user_tbl WHERE user_name = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "s", $username);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+if (mysqli_num_rows($result) > 0) {
+    $user = mysqli_fetch_assoc($result);
+    $user_type = $user['user_type'];
+    
+    // Only allow admin and superadmin
+    if (!in_array(strtolower($user_type), ['admin', 'superadmin'])) {
+        header('Location: ../../unauthorized.php'); // Redirect to styled unauthorized page
+        exit();
+    }
+} else {
+    // User not found in database
+    header('Location: ../../../index.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,7 +88,6 @@ include '../../../src/db/db_connection.php';
             <h3 style="color: #ffffff;">
                 <i class="fa-solid fa-user-circle me-2"></i>
             <?php
-                session_start();
                 if (!isset($_SESSION['username'])) {
                     header('Location: ../../../index.php');
                     exit();
@@ -113,18 +145,6 @@ include '../../../src/db/db_connection.php';
 
     <li class="sidebar-header" style="font-weight: bold; color: gray;">
         Admin Action
-    </li>
-    <li class="sidebar-item">
-        <a href="users.php" class="sidebar-link">
-            <i class="fa-solid fa-users pe-2"></i>
-            Users
-        </a>
-    </li>
-    <li class="sidebar-item">
-        <a href="user_log.php" class="sidebar-link">
-            <i class="fa-solid fa-file-lines pe-2"></i>
-            User Log
-        </a>
     </li>
     <li class="sidebar-item">
         <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"

@@ -1,3 +1,37 @@
+
+<?php
+include '../../../src/db/db_connection.php';
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: ../../../index.php');
+    exit();
+}
+
+// Check user type
+$username = $_SESSION['username'];
+$query = "SELECT user_type FROM user_tbl WHERE user_name = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "s", $username);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+if (mysqli_num_rows($result) > 0) {
+    $user = mysqli_fetch_assoc($result);
+    $user_type = $user['user_type'];
+    
+    // Only allow admin and superadmin
+    if (!in_array(strtolower($user_type), ['admin', 'superadmin'])) {
+        header('Location: ../../unauthorized.php'); // Redirect to styled unauthorized page
+        exit();
+    }
+} else {
+    // User not found in database
+    header('Location: ../../../index.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,15 +54,10 @@
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="mb-3">
-                <label for="id_number" class="form-label">ID Number</label>
-                <input type="int" class="form-control" id="id_number" name="id_number" required 
-                       inputmode="numeric" pattern="\d*">
-            </div>
-            <div class="mb-3">
                 <label for="phone_number" class="form-label">Mobile Number</label>
                 <input type="tel" class="form-control" id="phone_number" name="phone_number" 
                        pattern="^\d{11}$" placeholder="e.g., 09123456789" required>
-                <small class="form-text text-muted">Enter a 11-digit mobile number (e.g., 09123456789).</small>
+                <small class="form-text text-muted">Enter an 11-digit mobile number (e.g., 09123456789).</small>
             </div>
             <div class="mb-3">
                 <label for="pass" class="form-label">Password</label>
@@ -38,18 +67,8 @@
                 <label for="user_type" class="form-label">User Type</label>
                 <select class="form-select" id="user_type" name="user_type" required>
                     <option value="" disabled selected>Select User Type</option>
-                    <option value="Coordinator">Coordinator</option>
-                    <option value="Implementer">Implementer</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="district" class="form-label">District</label>
-                <select class="form-select" id="district" name="district" required>
-                    <option value="" disabled selected>Select District</option>
-                    <option value="District 1">District 1</option>
-                    <option value="District 2">District 2</option>
-                    <option value="District 3">District 3</option>
-                    <option value="District 4">District 4</option>
+                    <option value="admin">admin</option>
+                    <option value="user">user</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Add User</button>
@@ -60,17 +79,16 @@
     <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         include '../../../src/db/db_connection.php';
-        $id_number = $_POST['id_number'];
+
         $user_name = $_POST['user_name'];
         $email = $_POST['email'];
         $phone_number = $_POST['phone_number'];
         $pass = password_hash($_POST['pass'], PASSWORD_BCRYPT);
         $user_type = $_POST['user_type'];
-        $district = $_POST['district'];
 
-        // Update the SQL statement to include id_number
-        $sql = "INSERT INTO user_tbl (id_number, user_name, email, phone_number, pass, user_type, district) 
-                VALUES ('$id_number', '$user_name', '$email', '$phone_number', '$pass', '$user_type', '$district')";
+        // Updated SQL without 'id_number'
+        $sql = "INSERT INTO user_tbl (user_name, email, phone_number, pass, user_type) 
+                VALUES ('$user_name', '$email', '$phone_number', '$pass', '$user_type')";
         
         if ($conn->query($sql) === TRUE) {
             echo "<script>alert('New record created successfully'); window.location.href='users.php';</script>";
@@ -81,6 +99,7 @@
         $conn->close();
     }
     ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

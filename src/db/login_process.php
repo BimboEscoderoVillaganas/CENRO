@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
 
     if (!empty($username) && !empty($password)) {
-        $stmt = $conn->prepare("SELECT user_id, user_name, user_type, pass, district, status FROM user_tbl WHERE BINARY user_name = ? LIMIT 1");
+        $stmt = $conn->prepare("SELECT user_id, user_name, user_type, pass, status FROM user_tbl WHERE BINARY user_name = ? LIMIT 1");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['user_name'];
                 $_SESSION['user_type'] = $user['user_type'];
-                $_SESSION['district'] = $user['district'];
 
                 if (empty($user['status']) || strtolower($user['status']) == 'enable') {
                     $login_time = date("Y-m-d H:i:s");
@@ -29,11 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     $user_type = strtolower($user['user_type']);
                     if ($user_type == 'superadmin') {
-                        header("Location: ../../main_pages/admin/pages/dashboard.php");
+                        header("Location: ../../main_pages/superadmin/pages/dashboard.php");
                     } elseif ($user_type == 'user') {
                         header("Location: ../../main_pages/user/pages/dashboard.php");
                     } elseif ($user_type == 'admin') {
-                        header("Location: ../../main_pages/head/pages/dashboard.php");
+                        header("Location: ../../main_pages/admin/pages/dashboard.php");
                     }
                     exit();
                 } else {
