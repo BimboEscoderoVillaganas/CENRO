@@ -277,270 +277,356 @@ $archive_queue = $archive_row['archive'];
 
 
 
-                        <div class="row">
-                            <div class="col-md-12 col-lg-6">
-                                <div class="mb-3 card">
-                                    <div class="card-header-tab card-header-tab-animation card-header">
-                                        <div class="card-header-title">
-                                            <i class="header-icon lnr-apartment icon-gradient bg-love-kiss"> </i>
-                                            Sales Report
-                                        </div>
-                                        <ul class="nav">
-                                            <li class="nav-item"><a href="javascript:void(0);" class="active nav-link">Last</a></li>
-                                            <li class="nav-item"><a href="javascript:void(0);" class="nav-link second-tab-toggle">Current</a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="tab-content">
-                                            <div class="tab-pane fade show active" id="tabs-eg-77">
-                                                <div class="card mb-3 widget-chart widget-chart2 text-left w-100">
-                                                    <div class="widget-chat-wrapper-outer">
-                                                        <div class="widget-chart-wrapper widget-chart-wrapper-lg opacity-10 m-0">
-                                                            <canvas id="canvas"></canvas>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <h6 class="text-muted text-uppercase font-size-md opacity-5 font-weight-normal">Top Authors</h6>
-                                                <div class="scroll-area-sm">
-                                                    <div class="scrollbar-container">
-                                                        <ul class="rm-list-borders rm-list-borders-scroll list-group list-group-flush">
-                                                            <li class="list-group-item">
-                                                                <div class="widget-content p-0">
-                                                                    <div class="widget-content-wrapper">
-                                                                        <div class="widget-content-left mr-3">
-                                                                            <img width="42" class="rounded-circle" src="assets/images/avatars/9.jpg" alt="">
-                                                                        </div>
-                                                                        <div class="widget-content-left">
-                                                                            <div class="widget-heading">Ella-Rose Henry</div>
-                                                                            <div class="widget-subheading">Web Developer</div>
-                                                                        </div>
-                                                                        <div class="widget-content-right">
-                                                                            <div class="font-size-xlg text-muted">
-                                                                                <small class="opacity-5 pr-1">$</small>
-                                                                                <span>129</span>
-                                                                                <small class="text-danger pl-2">
-                                                                                    <i class="fa fa-angle-down"></i>
-                                                                                </small>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <div class="widget-content p-0">
-                                                                    <div class="widget-content-wrapper">
-                                                                        <div class="widget-content-left mr-3">
-                                                                            <img width="42" class="rounded-circle" src="assets/images/avatars/5.jpg" alt="">
-                                                                        </div>
-                                                                        <div class="widget-content-left">
-                                                                            <div class="widget-heading">Ruben Tillman</div>
-                                                                            <div class="widget-subheading">UI Designer</div>
-                                                                        </div>
-                                                                        <div class="widget-content-right">
-                                                                            <div class="font-size-xlg text-muted">
-                                                                                <small class="opacity-5 pr-1">$</small>
-                                                                                <span>54</span>
-                                                                                <small class="text-success pl-2">
-                                                                                    <i class="fa fa-angle-up"></i>
-                                                                                </small>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <div class="widget-content p-0">
-                                                                    <div class="widget-content-wrapper">
-                                                                        <div class="widget-content-left mr-3">
-                                                                            <img width="42" class="rounded-circle" src="assets/images/avatars/4.jpg" alt="">
-                                                                        </div>
-                                                                        <div class="widget-content-left">
-                                                                            <div class="widget-heading">Vinnie Wagstaff</div>
-                                                                            <div class="widget-subheading">Java Programmer</div>
-                                                                        </div>
-                                                                        <div class="widget-content-right">
-                                                                            <div class="font-size-xlg text-muted">
-                                                                                <small class="opacity-5 pr-1">$</small>
-                                                                                <span>429</span>
-                                                                                <small class="text-warning pl-2">
-                                                                                    <i class="fa fa-dot-circle"></i>
-                                                                                </small>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <div class="widget-content p-0">
-                                                                    <div class="widget-content-wrapper">
-                                                                        <div class="widget-content-left mr-3">
-                                                                            <img width="42" class="rounded-circle" src="assets/images/avatars/3.jpg" alt="">
-                                                                        </div>
-                                                                        <div class="widget-content-left">
-                                                                            <div class="widget-heading">Ella-Rose Henry</div>
-                                                                            <div class="widget-subheading">Web Developer</div>
-                                                                        </div>
-                                                                        <div class="widget-content-right">
-                                                                            <div class="font-size-xlg text-muted">
-                                                                                <small class="opacity-5 pr-1">$</small>
-                                                                                <span>129</span>
-                                                                                <small class="text-danger pl-2">
-                                                                                    <i class="fa fa-angle-down"></i>
-                                                                                </small>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <div class="widget-content p-0">
-                                                                    <div class="widget-content-wrapper">
-                                                                        <div class="widget-content-left mr-3">
-                                                                            <img width="42" class="rounded-circle" src="assets/images/avatars/2.jpg" alt="">
-                                                                        </div>
-                                                                        <div class="widget-content-left">
-                                                                            <div class="widget-heading">Ruben Tillman</div>
-                                                                            <div class="widget-subheading">UI Designer</div>
-                                                                        </div>
-                                                                        <div class="widget-content-right">
-                                                                            <div class="font-size-xlg text-muted">
-                                                                                <small class="opacity-5 pr-1">$</small>
-                                                                                <span>54</span>
-                                                                                <small class="text-success pl-2">
-                                                                                    <i class="fa fa-angle-up"></i>
-                                                                                </small>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+               <?php
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get current year and last year
+$currentYear = date('Y');
+$lastYear = $currentYear - 1;
+
+// Default to current year
+$selectedYear = $currentYear;
+$activeTab = 'current';
+
+// Check if user wants to see last year's data
+if (isset($_GET['year'])) {
+    if ($_GET['year'] == 'last') {
+        $selectedYear = $lastYear;
+        $activeTab = 'last';
+    }
+}
+
+// Get all document data for selected year, ordered by date_created in ascending order
+$docsQuery = "SELECT d.*, dt.document_type 
+              FROM document_tbl d
+              JOIN document_type dt ON d.document_type = dt.document_type
+              WHERE YEAR(d.date_created) = ?
+              ORDER BY d.date_created desc";  // Added ORDER BY clause here
+$stmt = $conn->prepare($docsQuery);
+$stmt->bind_param("i", $selectedYear);
+$stmt->execute();
+$docsResult = $stmt->get_result();
+
+// Process documents for both sections
+$documents = [];
+$monthlyData = [];
+$typeTotals = [];
+$overallTotal = 0;
+
+// Initialize monthly data structure for all document types
+$docTypesQuery = "SELECT document_type FROM document_type";
+$docTypesResult = $conn->query($docTypesQuery);
+while ($typeRow = $docTypesResult->fetch_assoc()) {
+    $monthlyData[$typeRow['document_type']] = array_fill(1, 12, 0);
+    $typeTotals[$typeRow['document_type']] = 0;
+}
+
+while ($row = $docsResult->fetch_assoc()) {
+    // For Document Logs
+    $documents[] = $row;
+    
+    // For Statistics
+    $month = date('n', strtotime($row['date_created']));
+    $docType = $row['document_type'];
+    
+    $monthlyData[$docType][$month]++;
+    $typeTotals[$docType]++;
+    $overallTotal++;
+}
+
+// Prepare data for Chart.js
+$labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+$datasets = [];
+$colors = [
+    'rgba(255, 99, 132, 0.7)',
+    'rgba(54, 162, 235, 0.7)',
+    'rgba(255, 206, 86, 0.7)',
+    'rgba(75, 192, 192, 0.7)',
+    'rgba(153, 102, 255, 0.7)',
+    'rgba(255, 159, 64, 0.7)'
+];
+$colorIndex = 0;
+
+foreach ($monthlyData as $type => $counts) {
+    $datasets[] = [
+        'label' => $type,
+        'data' => array_values($counts),
+        'backgroundColor' => $colors[$colorIndex % count($colors)],
+        'borderColor' => $colors[$colorIndex % count($colors)],
+        'borderWidth' => 1
+    ];
+    $colorIndex++;
+}
+?>
+
+<div class="row">
+    <div class="col-md-12 col-lg-6">
+        <div class="mb-3 card">
+            <div class="card-header-tab card-header-tab-animation card-header">
+                <div class="card-header-title">
+                    <i class="header-icon lnr-apartment icon-gradient bg-love-kiss"> </i>
+                    Documents Report
+                </div>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a href="?year=last" class="nav-link <?= $activeTab == 'last' ? 'active' : '' ?>">Last</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="?year=current" class="nav-link <?= $activeTab == 'current' ? 'active' : '' ?>">Current</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tabs-eg-77">
+                        <div class="card mb-3 widget-chart widget-chart2 text-left w-100">
+                            <div class="widget-chat-wrapper-outer">
+                                <div class="widget-chart-wrapper widget-chart-wrapper-lg opacity-10 m-0">
+                                    <canvas id="documentsChart" height="250"></canvas>
                                 </div>
                             </div>
-
-
-
-
-
-                            <div class="col-md-12 col-lg-6">
-                                <div class="mb-3 card">
-                                    <div class="card-header-tab card-header">
-                                        <div class="card-header-title">
-                                            <i class="header-icon lnr-rocket icon-gradient bg-tempting-azure"> </i>
-                                            Bandwidth Reports
-                                        </div>
-                                        <div class="btn-actions-pane-right">
-                                            <div class="nav">
-                                                <a href="javascript:void(0);" class="border-0 btn-pill btn-wide btn-transition active btn btn-outline-alternate">Tab 1</a>
-                                                <a href="javascript:void(0);" class="ml-1 btn-pill btn-wide border-0 btn-transition  btn btn-outline-alternate second-tab-toggle-alt">Tab 2</a>
+                        </div>
+                        <h6 class="text-muted text-uppercase font-size-md opacity-5 font-weight-normal">Document Logs</h6>
+                        <div class="scroll-area-sm" style="max-height: 300px; overflow-y: auto;">
+                            <div class="scrollbar-container">
+                                <ul class="rm-list-borders rm-list-borders-scroll list-group list-group-flush">
+                                    <?php foreach ($documents as $doc): 
+                                        $formattedDate = date('M d, Y', strtotime($doc['date_created']));
+                                    ?>
+                                    <li class="list-group-item">
+                                        <div class="widget-content p-0">
+                                            <div class="widget-content-wrapper">
+                                                <div class="widget-content-left mr-3">
+                                                    <?php 
+                                                    $docTypeIcon = match($doc['document_type']) {
+                                                        'CERTIFICATIONS' => 'fa-certificate',
+                                                        'CHARTS' => 'fa-chart-bar',
+                                                        'DELIVERY RECEIPTS' => 'fa-truck',
+                                                        default => 'fa-file'
+                                                    };
+                                                    ?>
+                                                    <div class="icon-wrapper rounded-circle">
+                                                        <i class="fa <?= $docTypeIcon ?> icon-gradient bg-amy-crisp"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="widget-content-left flex2">
+                                                    <div class="widget-heading"><?= htmlspecialchars($doc['description']) ?></div>
+                                                    <div class="widget-subheading opacity-7">
+                                                        <span class="pr-2">#<?= $doc['document_number'] ?></span>
+                                                        <span class="badge badge-pill badge-info"><?= $doc['document_type'] ?></span>
+                                                    </div>
+                                                </div>
+                                                <div class="widget-content-right">
+                                                    <div class="font-size-sm text-muted">
+                                                        <div><?= $formattedDate ?></div>
+                                                        <div class="text-primary"><?= $doc['filed_by'] ?></div>
+                                                    </div>
+                                                </div>
                                             </div>
+                                        </div>
+                                    </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 col-lg-6">
+    <div class="mb-3 card h-100"> <!-- Added h-100 to make card fill available height -->
+        <div class="card-header-tab card-header py-2"> <!-- Reduced padding with py-2 -->
+            <div class="card-header-title">
+                <i class="header-icon lnr-rocket icon-gradient bg-tempting-azure"></i>
+                Document Statistics
+            </div>
+        </div>
+        <div class="tab-content h-100 d-flex flex-column"> <!-- Flex layout for proper distribution -->
+            <div class="tab-pane fade active show flex-grow-1 d-flex flex-column" id="tab-eg-55"> <!-- Flex grow to fill space -->
+                <div class="widget-chart p-2 flex-grow-1" style="min-height: 150px;"> <!-- Reduced padding and flexible height -->
+                    <canvas id="lineChart" style="height: 100%; width: 100%;"></canvas> <!-- Canvas fills container -->
+                </div>
+                <div class="widget-chart-content text-center py-1"> <!-- Reduced padding -->
+                    <div class="widget-description text-warning small"> <!-- Added small class -->
+                        <i class="fa fa-calendar"></i>
+                        <span class="pl-1"><?= $selectedYear ?></span>
+                        <span class="text-muted opacity-8 pl-1">Total: <?= $overallTotal ?></span>
+                    </div>
+                </div>
+                <div class="card-body p-2 flex-grow-0"> <!-- Reduced padding and prevent growth -->
+                    <div class="row">
+                        <?php 
+                        $docTypesQuery = "SELECT document_type FROM document_type";
+                        $docTypesResult = $conn->query($docTypesQuery);
+                        $documentTypes = [];
+                        while ($typeRow = $docTypesResult->fetch_assoc()) {
+                            $documentTypes[] = $typeRow['document_type'];
+                        }
+                        
+                        $colorOptions = ['danger', 'success', 'primary', 'warning', 'info', 'dark', 'focus', 'alternate'];
+                        $colorIndex = 0;
+                        
+                        foreach ($documentTypes as $docType): 
+                            $count = $typeTotals[$docType] ?? 0;
+                            $percentage = $overallTotal > 0 ? round(($count / $overallTotal) * 100) : 0;
+                            $color = $colorOptions[$colorIndex % count($colorOptions)];
+                            $colorIndex++;
+                        ?>
+                        <div class="col-md-6 mb-1"> <!-- Reduced margin-bottom -->
+                            <div class="widget-content p-1"> <!-- Reduced padding -->
+                                <div class="widget-content-outer">
+                                    <div class="widget-content-wrapper align-items-center"> <!-- Center align items -->
+                                        <div class="widget-content-left pr-1"> <!-- Reduced padding -->
+                                            <div class="widget-numbers text-muted small font-weight-bold"><?= $count ?></div> <!-- Smaller text -->
+                                        </div>
+                                        <div class="widget-content-right flex-grow-1">
+                                            <div class="text-muted opacity-6 small text-truncate" title="<?= $docType ?>"><?= $docType ?></div> <!-- Truncate long names -->
                                         </div>
                                     </div>
-                                    <div class="tab-content">
-                                        <div class="tab-pane fade active show" id="tab-eg-55">
-                                            <div class="widget-chart p-3">
-                                                <div style="height: 350px">
-                                                    <canvas id="line-chart"></canvas>
-                                                </div>
-                                                <div class="widget-chart-content text-center mt-5">
-                                                    <div class="widget-description mt-0 text-warning">
-                                                        <i class="fa fa-arrow-left"></i>
-                                                        <span class="pl-1">175.5%</span>
-                                                        <span class="text-muted opacity-8 pl-1">increased server resources</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="pt-2 card-body">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="widget-content">
-                                                            <div class="widget-content-outer">
-                                                                <div class="widget-content-wrapper">
-                                                                    <div class="widget-content-left">
-                                                                        <div class="widget-numbers fsize-3 text-muted">63%</div>
-                                                                    </div>
-                                                                    <div class="widget-content-right">
-                                                                        <div class="text-muted opacity-6">Generated Leads</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="widget-progress-wrapper mt-1">
-                                                                    <div class="progress-bar-sm progress-bar-animated-alt progress">
-                                                                        <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="63" aria-valuemin="0" aria-valuemax="100" style="width: 63%;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="widget-content">
-                                                            <div class="widget-content-outer">
-                                                                <div class="widget-content-wrapper">
-                                                                    <div class="widget-content-left">
-                                                                        <div class="widget-numbers fsize-3 text-muted">32%</div>
-                                                                    </div>
-                                                                    <div class="widget-content-right">
-                                                                        <div class="text-muted opacity-6">Submitted Tickers</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="widget-progress-wrapper mt-1">
-                                                                    <div class="progress-bar-sm progress-bar-animated-alt progress">
-                                                                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="32" aria-valuemin="0" aria-valuemax="100" style="width: 32%;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="widget-content">
-                                                            <div class="widget-content-outer">
-                                                                <div class="widget-content-wrapper">
-                                                                    <div class="widget-content-left">
-                                                                        <div class="widget-numbers fsize-3 text-muted">71%</div>
-                                                                    </div>
-                                                                    <div class="widget-content-right">
-                                                                        <div class="text-muted opacity-6">Server Allocation</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="widget-progress-wrapper mt-1">
-                                                                    <div class="progress-bar-sm progress-bar-animated-alt progress">
-                                                                        <div class="progress-bar bg-primary" role="progressbar" aria-valuenow="71" aria-valuemin="0" aria-valuemax="100" style="width: 71%;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="widget-content">
-                                                            <div class="widget-content-outer">
-                                                                <div class="widget-content-wrapper">
-                                                                    <div class="widget-content-left">
-                                                                        <div class="widget-numbers fsize-3 text-muted">41%</div>
-                                                                    </div>
-                                                                    <div class="widget-content-right">
-                                                                        <div class="text-muted opacity-6">Generated Leads</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="widget-progress-wrapper mt-1">
-                                                                    <div class="progress-bar-sm progress-bar-animated-alt progress">
-                                                                        <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100" style="width: 41%;"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <div class="progress progress-xs mt-1"> <!-- Extra small progress -->
+                                        <div class="progress-bar bg-<?= $color ?>" 
+                                             role="progressbar" 
+                                             style="width: <?= $percentage ?>%;"
+                                             aria-valuenow="<?= $percentage ?>" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <?php endforeach; ?>
+                        
+                        <div class="col-md-6 mb-1">
+                            <div class="widget-content p-1">
+                                <div class="widget-content-outer">
+                                    <div class="widget-content-wrapper align-items-center">
+                                        <div class="widget-content-left pr-1">
+                                            <div class="widget-numbers text-muted small font-weight-bold"><?= $overallTotal ?></div>
+                                        </div>
+                                        <div class="widget-content-right flex-grow-1">
+                                            <div class="text-muted opacity-6 small">Total</div>
+                                        </div>
+                                    </div>
+                                    <div class="progress progress-xs mt-1">
+                                        <div class="progress-bar bg-warning" 
+                                             role="progressbar" 
+                                             style="width: 100%;"
+                                             aria-valuenow="100" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bar Chart for Documents by Type
+    const barCtx = document.getElementById('documentsChart').getContext('2d');
+    const barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: <?= json_encode($datasets) ?>
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Documents by Type (<?= $selectedYear ?>)'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Documents'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            }
+        }
+    });
+
+    // Line Chart for Monthly Totals
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    const monthlyTotals = Array(12).fill(0);
+    <?php 
+    // Calculate monthly totals across all document types
+    foreach ($monthlyData as $type => $counts) {
+        foreach ($counts as $month => $count) {
+            echo "monthlyTotals[$month-1] += $count;";
+        }
+    }
+    ?>
+    
+    const lineChart = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                label: 'Total Documents',
+                data: monthlyTotals,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Document Trends (<?= $selectedYear ?>)'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total Documents'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
 
 
 
@@ -585,7 +671,7 @@ $disabledUsers = $disabledUsersResult->fetch_assoc()['disabled'];
 ?>
                         <div class="row">
                             <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content">
+                                <div class="card mb-3 widget-content" onclick="window.location.href='users.php'" style="cursor: pointer;">
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left"><div class="widget-heading">Number of users</div>
@@ -600,7 +686,7 @@ $disabledUsers = $disabledUsersResult->fetch_assoc()['disabled'];
                                 </div>
                             </div>
                             <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content">
+                                <div class="card mb-3 widget-content" onclick="window.location.href='users.php'" style="cursor: pointer;">
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left"><div class="widget-heading">Inactive Accounts</div>
@@ -614,7 +700,7 @@ $disabledUsers = $disabledUsersResult->fetch_assoc()['disabled'];
                                 </div>
                             </div>
                             <div class="col-md-6 col-xl-4">
-                                <div class="card mb-3 widget-content">
+                                <div class="card mb-3 widget-content" onclick="window.location.href='users.php'" style="cursor: pointer;">
                                     <div class="widget-content-outer">
                                         <div class="widget-content-wrapper">
                                             <div class="widget-content-left">

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 13, 2025 at 02:35 AM
+-- Generation Time: Jun 13, 2025 at 05:56 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -68,12 +68,15 @@ CREATE TABLE `document_tbl` (
 --
 
 INSERT INTO `document_tbl` (`document_id`, `document_number`, `description`, `approving_authority`, `document_type`, `date_created`, `filed_by`, `location`, `retention_schedule`, `access_level`, `remarks`, `status`, `deleted`) VALUES
-(10, 0, 'sample 5', 'sample 5', 'CERTIFICATIONS', '2025-05-29', 'sample 4', '21', '0001-01-01', 'Public', 'sample 5', 'Active', 'no'),
-(11, 0, 'sample 6', 'sample 6', 'CERTIFICATIONS', '2010-06-30', 'sample 6', '21', '2011-06-30', 'Public', 'sample 6', 'Active', 'no'),
-(12, 0, 'Filed By', 'sample 7', 'CHARTS', '2009-06-30', 'sample 7', '20', 'PERMANENT', 'Confidential', 'Filed By', 'Active', 'no'),
-(13, 1233494, 'sample 10', 'sample 10', 'CHARTS', '2025-05-06', 'admin Bimbo', '20', 'PERMANENT', 'Public', 'sample 10', NULL, 'no'),
+(13, 1233494, 'sample 10', 'sample 10', 'CHARTS', '2025-06-06', 'admin Bimbo', '20', 'PERMANENT', 'Public', 'sample 10', 'Active', 'no'),
 (14, 1, 'for testing', 'for testing', 'CERTIFICATIONS', '2025-06-02', 'admin Bimbo', '21', '2026-06-02', 'Public', 'for testing', 'Active', 'no'),
-(15, 123, 'rfteg', 'fs', 'CERTIFICATIONS', '2025-06-09', 'samp', '21', '2026-06-09', 'Public', 'rtg', 'Active', 'no');
+(15, 123, 'rfteg', 'fs', 'CERTIFICATIONS', '2025-06-09', 'samp', '21', '2026-06-09', 'Public', 'rtg', 'Active', 'no'),
+(19, 1233494, 'sample 10', 'sample 10', 'CHARTS', '2025-05-06', 'admin Bimbo', '20', 'PERMANENT', 'Public', 'sample 10', 'Active', 'no'),
+(20, 1, 'for testing', 'for testing', 'CERTIFICATIONS', '2025-06-02', 'admin Bimbo', '21', '2026-06-02', 'Public', 'for testing', 'Active', 'no'),
+(21, 123, 'rfteg', 'fs', 'CERTIFICATIONS', '2025-06-09', 'samp', '21', '2026-06-09', 'Public', 'rtg', 'Active', 'no'),
+(24, 1, 'for testing', 'for testing', 'LISTS', '2025-06-02', 'admin Bimbo', '21', '2026-06-02', 'Public', 'for testing', 'Active', 'no'),
+(25, 123, 'rfteg', 'fs', 'CORRESPONDENCES', '2025-06-09', 'samp', '21', '2026-06-09', 'Public', 'rtg', 'Active', 'no'),
+(26, 0, 'thyju', 'ft', 'INQUIRIES', '2025-06-13', 'admin Bimbo', '20', '2027-06-13', 'Public', 'etyhj', 'Active', 'no');
 
 -- --------------------------------------------------------
 
@@ -94,7 +97,11 @@ CREATE TABLE `document_type` (
 INSERT INTO `document_type` (`document_type_id`, `document_type`, `shelf_life`) VALUES
 (4, 'CERTIFICATIONS', '1'),
 (6, 'CHARTS', 'PERMANENT'),
-(7, 'DELIVERY RECEIPTS', '2');
+(7, 'DELIVERY RECEIPTS', '2'),
+(8, 'GATE PASS', '1'),
+(9, 'INQUIRIES', '2'),
+(10, 'LISTS', '1'),
+(11, 'CORRESPONDENCES', '2');
 
 -- --------------------------------------------------------
 
@@ -282,7 +289,6 @@ INSERT INTO `user_tbl` (`user_id`, `user_name`, `email`, `phone_number`, `pass`,
 (2, 'admin Bimbo', 'admin@gmail.com', '0556282485', '$2y$10$TWyAZbbDQcms2lAoXPvqzOsotVJHvS/Cc9Ef5gi1MxrnXIhMqEHQm', 'superadmin', ''),
 (51, 'user', 'user@gmail.com', '09123456789', '$2y$10$t5s1OamaFxb/lfKweuNyQeNYAUo/GOXgxDapPsMdj2LNqFv3ZMa22', 'admin', 'enable'),
 (53, 'admin Bimbo', 'bimbo@gmail.com', '09999999999', '$2y$10$zF0Odp6OP26PXE.jzDHqdOJ625TNUjWS72yk8gXrlvaqvxFPgTK7W', 'superadmin', ''),
-(74, 'ako', 'bimbo@gmail.com', '09999999999', '$2y$10$kqy6y5pXXkPVkrcd6GKaOu6R9oUE2duy1xQNPCvLsYmgUWoaEmGLm', 'user', ''),
 (88, 'sample', 'sample@gmail.com', '09000000001', '$2y$10$FzOnKtwZU5yl9fdef8Lbju/lYP31iK5E/kuGgYApxBFI8Lwr/TsYO', 'admin', ''),
 (89, 'samp', 'samp@gmail.com', '09000000000', '$2y$10$pytvmH0UGNG/MMvvm9HNOufz4F7fzkP48iWsT9DUOMaB3e62kHkHy', 'user', 'enable');
 
@@ -344,13 +350,13 @@ ALTER TABLE `cabinet_tbl`
 -- AUTO_INCREMENT for table `document_tbl`
 --
 ALTER TABLE `document_tbl`
-  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `document_type`
 --
 ALTER TABLE `document_type`
-  MODIFY `document_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `document_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `file_tbl`
