@@ -51,6 +51,7 @@ if (mysqli_num_rows($result) > 0) {
 <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
+<link href="https://demo.dashboardpack.com/architectui-html-free/main.css" rel="stylesheet">
 <!--For SimpleStatistics-->
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -90,7 +91,7 @@ if (mysqli_num_rows($result) > 0) {
                     header('Location: ../../../index.php');
                     exit();
                 }
-                echo '<a href="#">' . htmlspecialchars($_SESSION['username']) . '</a>';
+                echo '<a href="#" style="color:white">' . htmlspecialchars($_SESSION['username']) . '</a>';
             ?>
         </h3>
     </div>
@@ -188,8 +189,659 @@ if (mysqli_num_rows($result) > 0) {
 <div class="container-fluid">
     <div class="container mt-4">
    
+<div class="row">
+ <?php
 
-    <h1>DASHBOARD</h1>
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query for total documents
+$total_query = "SELECT COUNT(*) AS total FROM document_tbl WHERE deleted = 'no'";
+$total_result = $conn->query($total_query);
+$total_row = $total_result->fetch_assoc();
+$total_documents = $total_row['total'];
+
+// Query for permanent documents
+$perm_query = "SELECT COUNT(*) AS permanent FROM document_tbl WHERE retention_schedule = 'PERMANENT' AND deleted = 'no'";
+$perm_result = $conn->query($perm_query);
+$perm_row = $perm_result->fetch_assoc();
+$permanent_documents = $perm_row['permanent'];
+
+// Query for archive queue
+$archive_query = "SELECT COUNT(*) AS archive FROM document_tbl 
+                 WHERE retention_schedule != 'PERMANENT' 
+                 AND STR_TO_DATE(retention_schedule, '%Y-%m-%d') < CURDATE() 
+                 AND deleted = 'no'";
+$archive_result = $conn->query($archive_query);
+$archive_row = $archive_result->fetch_assoc();
+$archive_queue = $archive_row['archive'];
+
+?>
+
+
+            <div class="col-md-6 col-xl-4">
+                <div class="card mb-3 widget-content bg-midnight-bloom" onclick="window.location.href='records.php'" style="cursor: pointer;">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Total Number of Documents</div>
+                            <div class="widget-subheading">All Documents</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white"><span><?php echo $total_documents; ?></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="card mb-3 widget-content bg-arielle-smile" onclick="window.location.href='permanent.php'" style="cursor: pointer;">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Permanent Documents</div>
+                            <div class="widget-subheading">Number of Permanent Documents</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white"><span><?php echo $permanent_documents; ?></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="card mb-3 widget-content bg-grow-early" onclick="window.location.href='archive_queue.php'" style="cursor: pointer;">
+                    <div class="widget-content-wrapper text-white">
+                        <div class="widget-content-left">
+                            <div class="widget-heading">Queue to Archive</div>
+                            <div class="widget-subheading">Number of documents to be archive</div>
+                        </div>
+                        <div class="widget-content-right">
+                            <div class="widget-numbers text-white"><span><?php echo $archive_queue; ?></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                            
+                        </div>
+
+
+
+               <?php
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get current year and last year
+$currentYear = date('Y');
+$lastYear = $currentYear - 1;
+
+// Default to current year
+$selectedYear = $currentYear;
+$activeTab = 'current';
+
+// Check if user wants to see last year's data
+if (isset($_GET['year'])) {
+    if ($_GET['year'] == 'last') {
+        $selectedYear = $lastYear;
+        $activeTab = 'last';
+    }
+}
+
+// Get all document data for selected year, ordered by date_created in ascending order
+$docsQuery = "SELECT d.*, dt.document_type 
+              FROM document_tbl d
+              JOIN document_type dt ON d.document_type = dt.document_type
+              WHERE YEAR(d.date_created) = ?
+              ORDER BY d.date_created desc";  // Added ORDER BY clause here
+$stmt = $conn->prepare($docsQuery);
+$stmt->bind_param("i", $selectedYear);
+$stmt->execute();
+$docsResult = $stmt->get_result();
+
+// Process documents for both sections
+$documents = [];
+$monthlyData = [];
+$typeTotals = [];
+$overallTotal = 0;
+
+// Initialize monthly data structure for all document types
+$docTypesQuery = "SELECT document_type FROM document_type";
+$docTypesResult = $conn->query($docTypesQuery);
+while ($typeRow = $docTypesResult->fetch_assoc()) {
+    $monthlyData[$typeRow['document_type']] = array_fill(1, 12, 0);
+    $typeTotals[$typeRow['document_type']] = 0;
+}
+
+while ($row = $docsResult->fetch_assoc()) {
+    // For Document Logs
+    $documents[] = $row;
+    
+    // For Statistics
+    $month = date('n', strtotime($row['date_created']));
+    $docType = $row['document_type'];
+    
+    $monthlyData[$docType][$month]++;
+    $typeTotals[$docType]++;
+    $overallTotal++;
+}
+
+// Prepare data for Chart.js
+$labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+$datasets = [];
+$colors = [
+    'rgba(255, 99, 132, 0.7)',
+    'rgba(54, 162, 235, 0.7)',
+    'rgba(255, 206, 86, 0.7)',
+    'rgba(75, 192, 192, 0.7)',
+    'rgba(153, 102, 255, 0.7)',
+    'rgba(255, 159, 64, 0.7)'
+];
+$colorIndex = 0;
+
+foreach ($monthlyData as $type => $counts) {
+    $datasets[] = [
+        'label' => $type,
+        'data' => array_values($counts),
+        'backgroundColor' => $colors[$colorIndex % count($colors)],
+        'borderColor' => $colors[$colorIndex % count($colors)],
+        'borderWidth' => 1
+    ];
+    $colorIndex++;
+}
+?>
+
+<div class="row">
+    <div class="col-md-12 col-lg-6">
+        <div class="mb-3 card">
+            <div class="card-header-tab card-header-tab-animation card-header">
+                <div class="card-header-title">
+                    <i class="header-icon lnr-apartment icon-gradient bg-love-kiss"> </i>
+                    Documents Report
+                </div>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a href="?year=last" class="nav-link <?= $activeTab == 'last' ? 'active' : '' ?>">Last</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="?year=current" class="nav-link <?= $activeTab == 'current' ? 'active' : '' ?>">Current</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tabs-eg-77">
+                        <div class="card mb-3 widget-chart widget-chart2 text-left w-100">
+                            <div class="widget-chat-wrapper-outer">
+                                <div class="widget-chart-wrapper widget-chart-wrapper-lg opacity-10 m-0">
+                                    <canvas id="documentsChart" height="250"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted text-uppercase font-size-md opacity-5 font-weight-normal">Document Logs</h6>
+                        <div class="scroll-area-sm" style="max-height: 300px; overflow-y: auto;">
+                            <div class="scrollbar-container">
+                                <ul class="rm-list-borders rm-list-borders-scroll list-group list-group-flush">
+                                    <?php foreach ($documents as $doc): 
+                                        $formattedDate = date('M d, Y', strtotime($doc['date_created']));
+                                    ?>
+                                    <li class="list-group-item">
+                                        <div class="widget-content p-0">
+                                            <div class="widget-content-wrapper">
+                                                <div class="widget-content-left mr-3">
+                                                    <?php 
+                                                    $docTypeIcon = match($doc['document_type']) {
+                                                        'CERTIFICATIONS' => 'fa-certificate',
+                                                        'CHARTS' => 'fa-chart-bar',
+                                                        'DELIVERY RECEIPTS' => 'fa-truck',
+                                                        default => 'fa-file'
+                                                    };
+                                                    ?>
+                                                    <div class="icon-wrapper rounded-circle">
+                                                        <i class="fa <?= $docTypeIcon ?> icon-gradient bg-amy-crisp"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="widget-content-left flex2">
+                                                    <div class="widget-heading"><?= htmlspecialchars($doc['description']) ?></div>
+                                                    <div class="widget-subheading opacity-7">
+                                                        <span class="pr-2">#<?= $doc['document_number'] ?></span>
+                                                        <span class="badge badge-pill badge-info"><?= $doc['document_type'] ?></span>
+                                                    </div>
+                                                </div>
+                                                <div class="widget-content-right">
+                                                    <div class="font-size-sm text-muted">
+                                                        <div><?= $formattedDate ?></div>
+                                                        <div class="text-primary"><?= $doc['filed_by'] ?></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 col-lg-6">
+    <div class="mb-3 card h-100"> <!-- Added h-100 to make card fill available height -->
+        <div class="card-header-tab card-header py-2"> <!-- Reduced padding with py-2 -->
+            <div class="card-header-title">
+                <i class="header-icon lnr-rocket icon-gradient bg-tempting-azure"></i>
+                Document Statistics
+            </div>
+        </div>
+        <div class="tab-content h-100 d-flex flex-column"> <!-- Flex layout for proper distribution -->
+            <div class="tab-pane fade active show flex-grow-1 d-flex flex-column" id="tab-eg-55"> <!-- Flex grow to fill space -->
+                <div class="widget-chart p-2 flex-grow-1" style="min-height: 150px;"> <!-- Reduced padding and flexible height -->
+                    <canvas id="lineChart" style="height: 100%; width: 100%;"></canvas> <!-- Canvas fills container -->
+                </div>
+                <div class="widget-chart-content text-center py-1"> <!-- Reduced padding -->
+                    <div class="widget-description text-warning small"> <!-- Added small class -->
+                        <i class="fa fa-calendar"></i>
+                        <span class="pl-1"><?= $selectedYear ?></span>
+                        <span class="text-muted opacity-8 pl-1">Total: <?= $overallTotal ?></span>
+                    </div>
+                </div>
+                <div class="card-body p-2 flex-grow-0"> <!-- Reduced padding and prevent growth -->
+                    <div class="row">
+                        <?php 
+                        $docTypesQuery = "SELECT document_type FROM document_type";
+                        $docTypesResult = $conn->query($docTypesQuery);
+                        $documentTypes = [];
+                        while ($typeRow = $docTypesResult->fetch_assoc()) {
+                            $documentTypes[] = $typeRow['document_type'];
+                        }
+                        
+                        $colorOptions = ['danger', 'success', 'primary', 'warning', 'info', 'dark', 'focus', 'alternate'];
+                        $colorIndex = 0;
+                        
+                        foreach ($documentTypes as $docType): 
+                            $count = $typeTotals[$docType] ?? 0;
+                            $percentage = $overallTotal > 0 ? round(($count / $overallTotal) * 100) : 0;
+                            $color = $colorOptions[$colorIndex % count($colorOptions)];
+                            $colorIndex++;
+                        ?>
+                        <div class="col-md-6 mb-1"> <!-- Reduced margin-bottom -->
+                            <div class="widget-content p-1"> <!-- Reduced padding -->
+                                <div class="widget-content-outer">
+                                    <div class="widget-content-wrapper align-items-center"> <!-- Center align items -->
+                                        <div class="widget-content-left pr-1"> <!-- Reduced padding -->
+                                            <div class="widget-numbers text-muted small font-weight-bold"><?= $count ?></div> <!-- Smaller text -->
+                                        </div>
+                                        <div class="widget-content-right flex-grow-1">
+                                            <div class="text-muted opacity-6 small text-truncate" title="<?= $docType ?>"><?= $docType ?></div> <!-- Truncate long names -->
+                                        </div>
+                                    </div>
+                                    <div class="progress progress-xs mt-1"> <!-- Extra small progress -->
+                                        <div class="progress-bar bg-<?= $color ?>" 
+                                             role="progressbar" 
+                                             style="width: <?= $percentage ?>%;"
+                                             aria-valuenow="<?= $percentage ?>" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                        
+                        <div class="col-md-6 mb-1">
+                            <div class="widget-content p-1">
+                                <div class="widget-content-outer">
+                                    <div class="widget-content-wrapper align-items-center">
+                                        <div class="widget-content-left pr-1">
+                                            <div class="widget-numbers text-muted small font-weight-bold"><?= $overallTotal ?></div>
+                                        </div>
+                                        <div class="widget-content-right flex-grow-1">
+                                            <div class="text-muted opacity-6 small">Total</div>
+                                        </div>
+                                    </div>
+                                    <div class="progress progress-xs mt-1">
+                                        <div class="progress-bar bg-warning" 
+                                             role="progressbar" 
+                                             style="width: 100%;"
+                                             aria-valuenow="100" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bar Chart for Documents by Type
+    const barCtx = document.getElementById('documentsChart').getContext('2d');
+    const barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: <?= json_encode($datasets) ?>
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Documents by Type (<?= $selectedYear ?>)'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Documents'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            }
+        }
+    });
+
+    // Line Chart for Monthly Totals
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    const monthlyTotals = Array(12).fill(0);
+    <?php 
+    // Calculate monthly totals across all document types
+    foreach ($monthlyData as $type => $counts) {
+        foreach ($counts as $month => $count) {
+            echo "monthlyTotals[$month-1] += $count;";
+        }
+    }
+    ?>
+    
+    const lineChart = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                label: 'Total Documents',
+                data: monthlyTotals,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Document Trends (<?= $selectedYear ?>)'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total Documents'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
+
+
+
+                        <?php
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query to get total number of users
+$totalUsersQuery = "SELECT COUNT(*) as total FROM user_tbl";
+$totalUsersResult = $conn->query($totalUsersQuery);
+$totalUsers = $totalUsersResult->fetch_assoc()['total'];
+
+// Query to get enabled/active accounts (exclude status = 'disable')
+$activeUsersQuery = "SELECT COUNT(DISTINCT u.user_id) as active 
+                     FROM user_tbl u 
+                     LEFT JOIN user_log l ON u.user_id = l.user_id 
+                     WHERE u.status != 'disable' 
+                     AND (
+                         u.status = 'enable' 
+                         OR (l.login_date > DATE_SUB(NOW(), INTERVAL 30 DAY))
+                     )";
+$activeUsersResult = $conn->query($activeUsersQuery);
+$activeUsers = $activeUsersResult->fetch_assoc()['active'];
+
+// Query to get inactive accounts (no recent activity)
+$inactiveUsersQuery = "SELECT COUNT(DISTINCT u.user_id) as inactive 
+                       FROM user_tbl u 
+                       LEFT JOIN user_log l ON u.user_id = l.user_id 
+                       WHERE (u.status IS NULL OR u.status != 'enable') 
+                       AND (l.login_date IS NULL OR l.login_date < DATE_SUB(NOW(), INTERVAL 30 DAY))
+                       AND u.status != 'disable'";
+$inactiveUsersResult = $conn->query($inactiveUsersQuery);
+$inactiveUsers = $inactiveUsersResult->fetch_assoc()['inactive'];
+
+// Query to get disabled accounts
+$disabledUsersQuery = "SELECT COUNT(*) as disabled FROM user_tbl WHERE status = 'disable'";
+$disabledUsersResult = $conn->query($disabledUsersQuery);
+$disabledUsers = $disabledUsersResult->fetch_assoc()['disabled'];
+?>
+                        <div class="row">
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card mb-3 widget-content" onclick="window.location.href='users.php'" style="cursor: pointer;">
+                                    <div class="widget-content-outer">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left"><div class="widget-heading">Number of users</div>
+                                            <div class="widget-subheading">Total registered accounts</div>
+
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-success"><?php echo $totalUsers; ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card mb-3 widget-content" onclick="window.location.href='users.php'" style="cursor: pointer;">
+                                    <div class="widget-content-outer">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left"><div class="widget-heading">Inactive Accounts</div>
+                                            <div class="widget-subheading">Inactive for 30+ days</div>
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-warning"><?php echo $inactiveUsers; ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card mb-3 widget-content" onclick="window.location.href='users.php'" style="cursor: pointer;">
+                                    <div class="widget-content-outer">
+                                        <div class="widget-content-wrapper">
+                                            <div class="widget-content-left">
+                                                <div class="widget-heading">Number of disabled accounts</div>
+                                                <div class="widget-subheading">Accounts currently deactivated or suspended</div>
+                                            </div>
+                                            <div class="widget-content-right">
+                                                <div class="widget-numbers text-danger"><?php echo $disabledUsers; ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>\
+                        </div>
+
+
+                        
+                        <div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-header">User Activity Log
+                <div class="btn-actions-pane-right">
+                    <div class="d-flex align-items-center">
+                        <div role="group" class="btn-group-sm btn-group mr-3">
+                            <button class="btn btn-focus filter-btn" data-filter="this-week">This Week</button>
+                            <button class="btn btn-focus filter-btn" data-filter="last-week">Last Week</button>
+                            <button class="btn btn-focus filter-btn active" data-filter="all-month">All Month</button>
+                        </div>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search users..." onkeyup="dynamicSearch()">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" type="button" id="searchButton">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table class="align-middle mb-0 table table-borderless table-striped table-hover" id="userLogTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center position-sticky top-0 bg-white">#</th>
+                            <th class="position-sticky top-0 bg-white">User Name</th>
+                            <th class="text-center position-sticky top-0 bg-white">Email</th>
+                            <th class="text-center position-sticky top-0 bg-white">Phone</th>
+                            <th class="text-center position-sticky top-0 bg-white">User Type</th>
+                            <th class="text-center position-sticky top-0 bg-white">Status</th>
+                            <th class="text-center position-sticky top-0 bg-white">Login Date</th>
+                            <th class="text-center position-sticky top-0 bg-white">Logout Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Default query for all month
+$query = "SELECT ul.log_id, ul.user_name, u.email, u.phone_number, u.user_type, u.status, 
+         ul.login_date, ul.logout_date 
+         FROM user_log ul
+         JOIN user_tbl u ON ul.user_id = u.user_id
+         WHERE MONTH(ul.login_date) = MONTH(CURRENT_DATE())
+         ORDER BY ul.login_date DESC";
+
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    $count = 1;
+    while($row = $result->fetch_assoc()) {
+        // Set default status to "Enable" if empty or null
+        $status = (!empty($row['status']) && $row['status'] != 'no data') ? $row['status'] : 'enable';
+        $badgeClass = ($status == 'enable') ? 'success' : 'warning';
+        
+        echo "<tr>";
+        echo "<td class='text-center text-muted'>".$count."</td>";
+        echo "<td>".htmlspecialchars($row['user_name'] ?? 'N/A')."</td>";
+        echo "<td class='text-center'>".htmlspecialchars($row['email'] ?? 'N/A')."</td>";
+        echo "<td class='text-center'>".htmlspecialchars($row['phone_number'] ?? 'N/A')."</td>";
+        echo "<td class='text-center'>".htmlspecialchars(ucfirst($row['user_type'] ?? 'N/A'))."</td>";
+        echo "<td class='text-center'><div class='badge badge-".$badgeClass."'>".htmlspecialchars(ucfirst($status))."</div></td>";
+        echo "<td class='text-center'>".($row['login_date'] ? date('M d, Y h:i A', strtotime($row['login_date'])) : 'N/A')."</td>";
+        echo "<td class='text-center'>".($row['logout_date'] ? date('M d, Y h:i A', strtotime($row['logout_date'])) : 'Still active')."</td>";
+        echo "</tr>";
+        $count++;
+    }
+} else {
+    echo "<tr><td colspan='9' class='text-center'>No user activity found</td></tr>";
+}
+?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-block text-center card-footer">
+                <button class="btn-wide btn btn-success" onclick="exportToExcel()">Export to Excel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Debounce function to limit how often search executes
+let searchTimer;
+function dynamicSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        fetchUserLogs(activeFilter, searchTerm);
+    }, 300); // 300ms delay after typing stops
+}
+
+// Filter buttons functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filter = this.getAttribute('data-filter');
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        fetchUserLogs(filter, searchTerm);
+    });
+});
+
+// Search button functionality
+document.getElementById('searchButton').addEventListener('click', function() {
+    const searchTerm = document.getElementById('searchInput').value.trim();
+    const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+    fetchUserLogs(activeFilter, searchTerm);
+});
+
+
+
+// Export to Excel function
+function exportToExcel() {
+    const table = document.getElementById('userLogTable');
+    const html = table.outerHTML;
+    const blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'user_activity_log.xls';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+</script>
+                        
+
+
+
+
+
 
     </div>
 
@@ -324,6 +976,12 @@ if (mysqli_num_rows($result) > 0) {
         });
     });
 </script>
+
+
+                <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script type="text/javascript" src="https://demo.dashboardpack.com/architectui-html-free/assets/scripts/main.js"></script>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
